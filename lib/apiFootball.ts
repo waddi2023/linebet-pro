@@ -1,0 +1,151 @@
+// Wrapper léger autour d'API-Football (v3, endpoint direct api-sports.io).
+// Toutes les requêtes sont server-side : la clé n'est jamais exposée au client.
+
+const HOST = process.env.API_FOOTBALL_HOST || "https://v3.football.api-sports.io";
+const KEY = process.env.API_FOOTBALL_KEY || "";
+
+export class ApiFootballError extends Error {
+  constructor(message: string, public code: "NO_KEY" | "HTTP" | "EMPTY" = "HTTP") {
+    super(message);
+    this.name = "ApiFootballError";
+  }
+}
+
+export function hasApiKey(): boolean {
+  return KEY.trim().length > 0;
+}
+
+interface ApiResponse<T> {
+  response: T;
+  errors: unknown;
+  results: number;
+}
+
+async function apiGet<T>(path: string, params: Record<string, string | number>): Promise<T> {
+  if (!hasApiKey()) {
+    throw new ApiFootballError(
+      "Clé API-Football absente. Définis la variable d'environnement API_FOOTBALL_KEY.",
+      "NO_KEY"
+    );
+  }
+  const qs = new URLSearchParams(
+    Object.entries(params).reduce((acc, [k, v]) => {
+      acc[k] = String(v);
+      return acc;
+    }, {} as Record<string, string>)
+  ).toString();
+
+  const url = `${HOST}${path}?${qs}`;
+  const isRapid = HOST.includes("rapidapi.com");
+  const headers: Record<string, string> = isRapid
+    ? {
+        "x-rapidapi-key": KEY,
+        "x-rapidapi-host": new URL(HOST).host,
+      }
+    : { "x-apisports-key": KEY };
+
+  const res = await fetch(url, { headers, next: { revalidate: 120 } });
+  if (!res.ok) {
+    throw new ApiFootballError(`API-Football HTTP ${res.status} sur ${path}`, "HTTP");
+  }
+  const json = (await res.json()) as ApiResponse<T>;
+  if (json.errors && Array.isArray(json.errors) ? (json.errors as unknown[]).length : json.errors && Object.keys(json.errors as object).length) {
+    const msg = JSON.stringify(json.errors);
+    throw new ApiFootballError(`API-Football a renvoyé une erreur : ${msg}`, "HTTP");
+  }
+  return json.response;
+}
+
+// ---------- Fixtures ----------
+
+export interface RawFixture {
+  fixture: { id: number; date: string; timestamp: number; status: { short: string } };
+  league: { id: number; name: string; country: string; logo: string; flag: string | null; round: string };
+  teams: {
+    home: { id: number; name: string; logo: string };
+    away: { id: number; name: string; logo: string };
+  };
+  goals: { home: number | null; away: number | null };
+}
+
+export async function getFixturesByDate(date: string): Promise<RawFixture[]> {
+  return apiGet<RawFixture[]>("/fixtures", { date });
+}
+
+export async function getFixtureById(id: number): Promise<RawFixture[]> {
+  return apiGet<RawFixture[]>("/fixtures", { id });
+}
+
+// ---------- Predictions ----------
+
+export interface RawPrediction {
+  predictions: {
+    winner: { id: number | null; name: string | null; comment: string | null };
+    win_or_draw: boolean;
+    under_over: string | null;
+    goals: { home: string | null; away: string | null };
+    advice: string | null;
+    percent: { home: string; draw: string; away: string };
+  };
+  league: { id: number; name: string; season: number };
+  teams: {
+    home: RawPredTeam;
+    away: RawPredTeam;
+  };
+  comparison: Record<string, { home: string; away: string }>;
+  h2h: RawFixture[];
+}
+
+export interface RawPredTeam {
+  id: number;
+  name: string;
+  logo: string;
+  last_5: {
+    played: number;
+    form: string;
+    att: string;
+    def: string;
+    goals: {
+      for: { total: number; average: number };
+      against: { total: number; average: number };
+    };
+  };
+  league: {
+    form: string | null;
+    goals: {
+      for: { total: { home: number; away: number; total: number }; average: { home: string; away: string; total: string } };
+      against: { total: { home: number; away: number; total: number }; average: { home: string; away: string; total: string } };
+    };
+  };
+}
+
+export async function getPrediction(fixtureId: number): Promise<RawPrediction | null> {
+  const r = await apiGet<RawPrediction[]>("/predictions", { fixture: fixtureId });
+  return r.length ? r[0] : null;
+}
+
+// ---------- Odds ----------
+
+export interface RawOdds {
+  bookmakers: {
+    id: number;
+    name: string;
+    bets: { id: number; name: string; values: { value: string; odd: string }[] }[];
+  }[];
+}
+
+export async function getOdds(fixtureId: number): Promise<RawOdds | null> {
+  const r = await apiGet<{ bookmakers: RawOdds["bookmakers"] }[]>("/odds", { fixture: fixtureId });
+  return r.length ? { bookmakers: r[0].bookmakers } : null;
+}
+
+// ---------- Top scorers ----------
+
+export interface RawTopScorer {
+  player: { id: number; name: string };
+  statistics: { team: { id: number; name: string }; goals: { total: number | null } }[];
+}
+
+export async function getTopScorers(league: number, season: number): Promise<RawTopScorer[]> {
+  return apiGet<RawTopScorer[]>("/players/topscorers", { league, season });
+}
