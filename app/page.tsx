@@ -82,6 +82,16 @@ export default function Home() {
             {loading ? "Chargement…" : `${filtered.length} match(s)`}
           </span>
         </div>
+        <Link
+          href="/best"
+          className="mt-4 flex items-center gap-3 rounded-xl border border-accent/20 bg-accent/10 px-4 py-3 transition hover:bg-accent/20"
+        >
+          <span className="text-xl">🔥</span>
+          <span className="text-sm">
+            <span className="font-semibold text-accent">Tu ne sais pas sur quoi parier ?</span>
+            <span className="text-white/60"> Laisse l'agent choisir les meilleurs matchs du jour →</span>
+          </span>
+        </Link>
       </section>
 
       {error && (

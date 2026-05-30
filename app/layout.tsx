@@ -22,7 +22,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 LineBet <span className="text-accent">Pro</span>
               </span>
             </Link>
-            <span className="text-xs text-white/40">Agent Expert Paris Sportifs · EV+</span>
+            <nav className="flex items-center gap-4 text-sm">
+              <Link href="/" className="text-white/60 transition hover:text-white">
+                Matchs
+              </Link>
+              <Link
+                href="/best"
+                className="rounded-lg bg-accent/15 px-3 py-1.5 font-medium text-accent transition hover:bg-accent/25"
+              >
+                🔥 Meilleurs paris
+              </Link>
+            </nav>
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>

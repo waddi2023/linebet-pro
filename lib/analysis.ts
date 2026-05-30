@@ -19,7 +19,7 @@ import type {
   ConfidenceBreakdown,
 } from "./types";
 
-function parsePercent(s: string | null | undefined): number {
+export function parsePercent(s: string | null | undefined): number {
   if (!s) return 0;
   const n = parseFloat(String(s).replace("%", "").trim());
   return isNaN(n) ? 0 : n / 100;
@@ -31,7 +31,7 @@ function num(s: string | number | null | undefined, fallback = 0): number {
   return isNaN(n) ? fallback : n;
 }
 
-function toFixtureLite(r: RawFixture): FixtureLite {
+export function toFixtureLite(r: RawFixture): FixtureLite {
   return {
     id: r.fixture.id,
     date: r.fixture.date,
@@ -53,7 +53,7 @@ function toFixtureLite(r: RawFixture): FixtureLite {
 }
 
 // Expected goals à partir des moyennes saison (attaque domicile vs défense extérieure, etc.).
-function expectedGoals(pred: RawPrediction): { home: number; away: number } {
+export function expectedGoals(pred: RawPrediction): { home: number; away: number } {
   const h = pred.teams.home.league.goals;
   const a = pred.teams.away.league.goals;
   const homeAttHome = num(h.for.average.home, NaN);
@@ -139,7 +139,7 @@ function mkRow(market: string, pick: string, prob: number, odd: number | null): 
 }
 
 // --- Score de confiance (barème de l'agent) ---
-function confidence(
+export function confidence(
   pred: RawPrediction | null,
   model: ProbTriple,
   hasOdds: boolean,
