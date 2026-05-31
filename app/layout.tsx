@@ -22,9 +22,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 LineBet <span className="text-accent">Pro</span>
               </span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
+            <nav className="flex items-center gap-3 text-sm">
               <Link href="/" className="text-white/60 transition hover:text-white">
                 Matchs
+              </Link>
+              <Link
+                href="/live"
+                className="flex items-center gap-1.5 rounded-lg bg-red-500/15 px-3 py-1.5 font-medium text-red-300 transition hover:bg-red-500/25"
+              >
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /> En direct
               </Link>
               <Link
                 href="/best"

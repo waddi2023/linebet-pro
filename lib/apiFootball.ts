@@ -59,7 +59,12 @@ async function apiGet<T>(path: string, params: Record<string, string | number>):
 // ---------- Fixtures ----------
 
 export interface RawFixture {
-  fixture: { id: number; date: string; timestamp: number; status: { short: string } };
+  fixture: {
+    id: number;
+    date: string;
+    timestamp: number;
+    status: { short: string; long?: string; elapsed: number | null };
+  };
   league: { id: number; name: string; country: string; logo: string; flag: string | null; round: string };
   teams: {
     home: { id: number; name: string; logo: string };
@@ -74,6 +79,21 @@ export async function getFixturesByDate(date: string): Promise<RawFixture[]> {
 
 export async function getFixtureById(id: number): Promise<RawFixture[]> {
   return apiGet<RawFixture[]>("/fixtures", { id });
+}
+
+// Matchs actuellement en direct.
+export async function getLiveFixtures(): Promise<RawFixture[]> {
+  return apiGet<RawFixture[]>("/fixtures", { live: "all" });
+}
+
+// Statistiques en direct (tirs, attaques dangereuses, possession, corners…).
+export interface RawTeamStats {
+  team: { id: number; name: string; logo: string };
+  statistics: { type: string; value: number | string | null }[];
+}
+
+export async function getFixtureStatistics(fixtureId: number): Promise<RawTeamStats[]> {
+  return apiGet<RawTeamStats[]>("/fixtures/statistics", { fixture: fixtureId });
 }
 
 // ---------- Predictions ----------
