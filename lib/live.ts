@@ -128,7 +128,7 @@ interface RawTeamFields {
   hasXg: boolean; hasSi: boolean; hasShots: boolean; hasPoss: boolean; hasAnyStat: boolean;
 }
 
-function readTeam(stats: RawTeamStats | undefined): RawTeamFields {
+export function readTeam(stats: RawTeamStats | undefined): RawTeamFields {
   const sogR = statRaw(stats, "Shots on Goal");
   const tsR = statRaw(stats, "Total Shots");
   const siR = statRaw(stats, "Shots insidebox");
@@ -174,7 +174,7 @@ function proxyXg(t: RawTeamFields, savesOpp: number, coarse: boolean): number {
 }
 
 // Occasions (chances de tir crédibles).
-function chancesOf(t: RawTeamFields): number | null {
+export function chancesOf(t: RawTeamFields): number | null {
   if (t.hasSi) {
     const siOff = Math.max(0, t.si - t.sog);
     return t.sog + 0.5 * t.bl + 0.5 * siOff + 0.25 * t.ck;
@@ -185,7 +185,7 @@ function chancesOf(t: RawTeamFields): number | null {
 }
 
 // Grosses occasions (occasions franches).
-function bigChancesOf(
+export function bigChancesOf(
   t: RawTeamFields,
   goals: number,
   savesOpp: number,
@@ -208,7 +208,7 @@ function bigChancesOf(
   return { value: null, source: null };
 }
 
-function buildPressure(
+export function buildPressure(
   homeRaw: RawTeamFields,
   awayRaw: RawTeamFields,
   elapsed: number
