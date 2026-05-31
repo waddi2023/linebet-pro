@@ -57,14 +57,14 @@ export default function Home() {
   }, {} as Record<string, FixtureLite[]>);
 
   return (
-    <div className="space-y-6">
-      <section className="card p-5">
-        <h1 className="text-xl font-bold tracking-tight">Analyse de match EV+</h1>
+    <div className="space-y-5 sm:space-y-6">
+      <section className="card p-4 sm:p-5">
+        <h1 className="text-lg font-bold tracking-tight sm:text-xl">Analyse de match EV+</h1>
         <p className="mt-1 text-sm text-white/50">
           Choisis une date, sélectionne un match, et l'agent produit l'analyse complète : probabilités 1X2,
           simulation de 10 000 matchs, marchés, value bets et score de confiance.
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
           <input
             type="date"
             value={date}
@@ -76,7 +76,7 @@ export default function Home() {
             placeholder="Filtrer (équipe, championnat, pays)…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="min-w-[220px] flex-1 rounded-lg border border-white/10 bg-pitch-700 px-3 py-2 text-sm outline-none focus:border-accent"
+            className="w-full rounded-lg border border-white/10 bg-pitch-700 px-3 py-2 text-sm outline-none focus:border-accent sm:min-w-[220px] sm:flex-1"
           />
           <span className="text-xs text-white/40">
             {loading ? "Chargement…" : `${filtered.length} match(s)`}
@@ -84,10 +84,10 @@ export default function Home() {
         </div>
         <Link
           href="/best"
-          className="mt-4 flex items-center gap-3 rounded-xl border border-accent/20 bg-accent/10 px-4 py-3 transition hover:bg-accent/20"
+          className="mt-4 flex items-center gap-2 rounded-xl border border-accent/20 bg-accent/10 px-3 py-2.5 transition hover:bg-accent/20 sm:gap-3 sm:px-4 sm:py-3"
         >
-          <span className="text-xl">🔥</span>
-          <span className="text-sm">
+          <span className="text-lg sm:text-xl">🔥</span>
+          <span className="text-xs sm:text-sm">
             <span className="font-semibold text-accent">Tu ne sais pas sur quoi parier ?</span>
             <span className="text-white/60"> Laisse l'agent choisir les meilleurs matchs du jour →</span>
           </span>
@@ -131,9 +131,9 @@ export default function Home() {
                 <li key={f.id}>
                   <Link
                     href={`/match/${f.id}`}
-                    className="flex items-center gap-3 px-4 py-3 transition hover:bg-white/5"
+                    className="flex items-center gap-2 px-3 py-3 transition hover:bg-white/5 sm:gap-3 sm:px-4"
                   >
-                    <span className="w-12 shrink-0 text-xs text-white/40">
+                    <span className="w-10 shrink-0 text-[11px] text-white/40 sm:w-12 sm:text-xs">
                       {new Date(f.timestamp * 1000).toLocaleTimeString("fr-FR", {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -144,7 +144,7 @@ export default function Home() {
                       {f.goalsHome != null ? `${f.goalsHome}-${f.goalsAway}` : "vs"}
                     </span>
                     <Team logo={f.away.logo} name={f.away.name} align="left" />
-                    <span className="ml-auto hidden shrink-0 text-accent sm:inline">Analyser →</span>
+                    <span className="ml-auto hidden shrink-0 text-accent lg:inline">Analyser →</span>
                   </Link>
                 </li>
               ))}
@@ -159,16 +159,16 @@ export default function Home() {
 function Team({ logo, name, align }: { logo: string; name: string; align: "left" | "right" }) {
   return (
     <span
-      className={`flex flex-1 items-center gap-2 ${align === "right" ? "justify-end text-right" : "justify-start"}`}
+      className={`flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2 ${align === "right" ? "justify-end text-right" : "justify-start"}`}
     >
       {align === "left" && logo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logo} alt="" className="h-5 w-5 object-contain" />
+        <img src={logo} alt="" className="h-5 w-5 shrink-0 object-contain" />
       )}
-      <span className="truncate text-sm">{name}</span>
+      <span className="truncate text-xs sm:text-sm">{name}</span>
       {align === "right" && logo && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logo} alt="" className="h-5 w-5 object-contain" />
+        <img src={logo} alt="" className="h-5 w-5 shrink-0 object-contain" />
       )}
     </span>
   );

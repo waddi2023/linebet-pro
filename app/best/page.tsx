@@ -35,14 +35,14 @@ export default function BestPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="card p-5">
-        <h1 className="text-xl font-bold tracking-tight">🔥 Meilleurs paris du jour</h1>
+    <div className="space-y-5 sm:space-y-6">
+      <section className="card p-4 sm:p-5">
+        <h1 className="text-lg font-bold tracking-tight sm:text-xl">🔥 Meilleurs paris du jour</h1>
         <p className="mt-1 text-sm text-white/50">
           L'agent scanne les matchs (priorité aux grands championnats), simule chacun et te classe les{" "}
           <span className="text-white/70">meilleures probabilités</span> + le coupon le plus sûr.
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
           <input
             type="date"
             value={date}
@@ -66,7 +66,7 @@ export default function BestPage() {
           <button
             onClick={run}
             disabled={loading}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-pitch-900 transition hover:brightness-110 disabled:opacity-50"
+            className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-pitch-900 transition hover:brightness-110 disabled:opacity-50 sm:w-auto sm:py-2"
           >
             {loading ? "Analyse en cours…" : "Trouver les meilleurs paris"}
           </button>
@@ -173,11 +173,11 @@ function PickCard({ p, rank }: { p: BestPick; rank: number }) {
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <div className="rounded-lg bg-accent-soft/40 p-2.5">
           <div className="text-[10px] uppercase tracking-wide text-white/40">Pari recommandé (le plus sûr)</div>
-          <div className="mt-0.5 flex items-center justify-between">
-            <span className="text-sm font-bold text-accent">
+          <div className="mt-0.5 flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-sm font-bold text-accent">
               {p.safest.market} · {p.safest.selection}
             </span>
-            <span className="text-sm font-bold">{pct(p.safest.prob)}</span>
+            <span className="shrink-0 text-sm font-bold">{pct(p.safest.prob)}</span>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-2 text-center text-xs">
@@ -187,7 +187,7 @@ function PickCard({ p, rank }: { p: BestPick; rank: number }) {
         </div>
       </div>
 
-      <div className="mt-2 flex items-center gap-3 text-xs">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
         <span className={`font-semibold ${confColor}`}>Confiance {p.confidence}/100</span>
         <span className="text-white/30">xG {p.expectedGoals.home}–{p.expectedGoals.away}</span>
         <span className="ml-auto text-accent">Analyse détaillée →</span>

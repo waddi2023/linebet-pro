@@ -77,20 +77,20 @@ function Report({ d }: { d: AnalysisResult }) {
   return (
     <div className="space-y-5">
       {/* En-tête */}
-      <section className="card p-5">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-white/50">
-            {f.league.logo && <img src={f.league.logo} alt="" className="h-4 w-4 object-contain" />}
-            <span>
+      <section className="card p-4 sm:p-5">
+        <div className="flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-2 text-xs text-white/50">
+            {f.league.logo && <img src={f.league.logo} alt="" className="h-4 w-4 shrink-0 object-contain" />}
+            <span className="truncate">
               {f.league.country} · {f.league.name} {f.league.round ? `· ${f.league.round}` : ""}
             </span>
           </div>
-          <span className="text-xs text-white/40">{kickoff}</span>
+          <span className="shrink-0 text-[11px] text-white/40 sm:text-xs">{kickoff}</span>
         </div>
-        <div className="mt-4 grid grid-cols-3 items-center gap-2">
+        <div className="mt-4 grid grid-cols-3 items-center gap-1 sm:gap-2">
           <TeamBig logo={f.home.name ? f.home.logo : ""} name={f.home.name} />
           <div className="text-center">
-            <div className="text-2xl font-black text-white/80">VS</div>
+            <div className="text-xl font-black text-white/80 sm:text-2xl">VS</div>
             <div className="mt-1 text-[11px] text-white/40">
               xG {d.expectedGoals.home} – {d.expectedGoals.away}
             </div>
@@ -176,8 +176,8 @@ function Report({ d }: { d: AnalysisResult }) {
 
       {/* Étape 4+5 : Marchés & value */}
       <Section title="③ Marchés & détection de value" subtitle="Value = (proba × cote) − 1">
-        <div className="overflow-x-auto scroll-thin">
-          <table className="w-full min-w-[560px]">
+        <div className="-mx-4 overflow-x-auto scroll-thin px-4 sm:mx-0 sm:px-0">
+          <table className="w-full min-w-[480px]">
             <thead>
               <tr>
                 <th className="th">Marché</th>
@@ -207,11 +207,11 @@ function Report({ d }: { d: AnalysisResult }) {
         {d.scorers.length ? (
           <ol className="space-y-1.5">
             {d.scorers.map((s, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm">
-                <span className="w-5 text-white/40">{i + 1}.</span>
+              <li key={i} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
+                <span className="w-5 shrink-0 text-white/40">{i + 1}.</span>
                 <span className="font-medium">{s.name}</span>
                 <span className="text-xs text-white/40">{s.team}</span>
-                <span className="ml-auto text-xs text-white/60">{s.goalsSeason ?? "?"} buts (saison)</span>
+                <span className="ml-auto shrink-0 text-xs text-white/60">{s.goalsSeason ?? "?"} buts</span>
               </li>
             ))}
           </ol>
@@ -236,7 +236,7 @@ function Report({ d }: { d: AnalysisResult }) {
             ["Marché des cotes", d.confidence.marche, 5],
           ].map(([label, val, max]) => (
             <div key={label as string} className="flex items-center gap-2">
-              <span className="w-40 shrink-0 text-xs text-white/50">{label}</span>
+              <span className="w-28 shrink-0 text-xs text-white/50 sm:w-40">{label}</span>
               <div className="bar flex-1">
                 <div className="h-full bg-gold" style={{ width: `${((val as number) / (max as number)) * 100}%` }} />
               </div>
@@ -249,9 +249,9 @@ function Report({ d }: { d: AnalysisResult }) {
       </Section>
 
       {/* Étape 8 : Verdict */}
-      <section className="card border-accent/20 bg-accent-soft/30 p-5">
+      <section className="card border-accent/20 bg-accent-soft/30 p-4 sm:p-5">
         <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-accent">⑥ Verdict final</h3>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
           <VerdictItem icon="🥇" label="Meilleur pari" value={d.verdict.meilleurPari} />
           <VerdictItem icon="🥈" label="Pari le plus sûr" value={d.verdict.pariSur} />
           <VerdictItem icon="🥉" label="Value bet" value={d.verdict.valueBet} />
@@ -263,7 +263,7 @@ function Report({ d }: { d: AnalysisResult }) {
             <span className="text-2xl font-black text-accent">{d.verdict.confianceGlobale}</span>
             <span className="text-xs text-white/40">/100</span>
           </div>
-          <div className="ml-auto rounded-lg bg-white/5 px-3 py-1.5 text-xs">
+          <div className="rounded-lg bg-white/5 px-3 py-1.5 text-xs sm:ml-auto">
             💰 Mise recommandée : <span className="font-semibold text-white/80">{d.verdict.miseRecommandee}</span>
           </div>
         </div>
@@ -311,7 +311,7 @@ function VerdictItem({ icon, label, value }: { icon: string; label: string; valu
 
 function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="card p-5">
+    <section className="card p-4 sm:p-5">
       <div className="mb-4">
         <h3 className="text-sm font-bold tracking-tight">{title}</h3>
         {subtitle && <p className="text-xs text-white/40">{subtitle}</p>}
@@ -324,14 +324,14 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 function ProbTripleBar({ t, home, away }: { t: { home: number; draw: number; away: number }; home: string; away: string }) {
   return (
     <div>
-      <div className="flex h-9 overflow-hidden rounded-lg text-xs font-semibold">
-        <div className="flex items-center justify-center bg-accent/80 text-pitch-900" style={{ width: pct(t.home) }}>
+      <div className="flex h-8 overflow-hidden rounded-lg text-[10px] font-semibold sm:h-9 sm:text-xs">
+        <div className="flex items-center justify-center overflow-hidden bg-accent/80 text-pitch-900" style={{ width: pct(t.home) }}>
           {pct(t.home)}
         </div>
-        <div className="flex items-center justify-center bg-white/15" style={{ width: pct(t.draw) }}>
+        <div className="flex items-center justify-center overflow-hidden bg-white/15" style={{ width: pct(t.draw) }}>
           {pct(t.draw)}
         </div>
-        <div className="flex items-center justify-center bg-gold/80 text-pitch-900" style={{ width: pct(t.away) }}>
+        <div className="flex items-center justify-center overflow-hidden bg-gold/80 text-pitch-900" style={{ width: pct(t.away) }}>
           {pct(t.away)}
         </div>
       </div>
@@ -368,9 +368,9 @@ function MiniTriple({ title, t }: { title: string; t: { home: number; draw: numb
 
 function TeamBig({ logo, name }: { logo: string; name: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 text-center">
-      {logo && <img src={logo} alt="" className="h-14 w-14 object-contain" />}
-      <span className="text-sm font-semibold leading-tight">{name}</span>
+    <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+      {logo && <img src={logo} alt="" className="h-11 w-11 object-contain sm:h-14 sm:w-14" />}
+      <span className="text-xs font-semibold leading-tight sm:text-sm">{name}</span>
     </div>
   );
 }

@@ -63,25 +63,25 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
       {data && (
         <>
           {/* Score & minute */}
-          <section className="card p-5">
-            <div className="mb-3 flex items-center justify-between text-xs text-white/40">
-              <span className="flex items-center gap-2">
+          <section className="card p-4 sm:p-5">
+            <div className="mb-3 flex items-center justify-between gap-2 text-xs text-white/40">
+              <span className="flex min-w-0 items-center gap-2">
                 {data.fixture.league.logo && (
-                  <img src={data.fixture.league.logo} alt="" className="h-4 w-4 object-contain" />
+                  <img src={data.fixture.league.logo} alt="" className="h-4 w-4 shrink-0 object-contain" />
                 )}
-                {data.fixture.league.country} · {data.fixture.league.name}
+                <span className="truncate">{data.fixture.league.country} · {data.fixture.league.name}</span>
               </span>
               {data.live && (
-                <span className="flex items-center gap-1 font-bold text-red-400">
+                <span className="flex shrink-0 items-center gap-1 font-bold text-red-400">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
                   {data.status} · {data.elapsed}′
                 </span>
               )}
             </div>
-            <div className="grid grid-cols-3 items-center gap-2">
+            <div className="grid grid-cols-3 items-center gap-1 sm:gap-2">
               <TeamHead name={data.fixture.home.name} logo={data.fixture.home.logo} />
               <div className="text-center">
-                <div className="text-3xl font-black">
+                <div className="text-2xl font-black sm:text-3xl">
                   {data.score.home} <span className="text-white/30">-</span> {data.score.away}
                 </div>
                 {data.live && <div className="mt-1 text-[11px] text-white/40">{data.minutesRemaining}′ restantes</div>}
@@ -93,7 +93,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
           {data.live && <LiveAlerts d={data} />}
 
           {/* VERDICT BUT SUPPLÉMENTAIRE */}
-          <section className={`card p-5 ${verdictBg(data.verdict.moreGoals)}`}>
+          <section className={`card p-4 sm:p-5 ${verdictBg(data.verdict.moreGoals)}`}>
             <div className="text-xs uppercase tracking-wide text-white/50">⚽ Probabilité de but supplémentaire</div>
             <div className="mt-1 flex flex-wrap items-end gap-3">
               <span className={`text-3xl font-black ${verdictColor(data.verdict.moreGoals)}`}>
@@ -129,7 +129,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
           {data.live && (
             <>
               {/* Prochain but + projections */}
-              <section className="card p-5">
+              <section className="card p-4 sm:p-5">
                 <h3 className="mb-3 text-sm font-bold">Qui marque le prochain but ?</h3>
                 <div className="flex h-8 overflow-hidden rounded-lg text-xs font-semibold">
                   <div
@@ -145,12 +145,12 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
                     {data.nextGoalLean.awayPct}%
                   </div>
                 </div>
-                <div className="mt-1 flex justify-between text-[11px] text-white/50">
-                  <span className="truncate">{data.fixture.home.name}</span>
-                  <span className="truncate">{data.fixture.away.name}</span>
+                <div className="mt-1 flex justify-between gap-2 text-[11px] text-white/50">
+                  <span className="min-w-0 truncate">{data.fixture.home.name}</span>
+                  <span className="min-w-0 truncate text-right">{data.fixture.away.name}</span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
+                <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 sm:gap-3">
                   <Stat label="Buts attendus (reste)" value={data.expectedRemainingGoals.toFixed(2)} />
                   <Stat label="Total final projeté" value={data.projectedFinalTotal.toFixed(2)} />
                   <Stat label="Buts actuels" value={String(data.score.total)} />
@@ -158,7 +158,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
               </section>
 
               {/* Over/Under sur le total FINAL */}
-              <section className="card p-5">
+              <section className="card p-4 sm:p-5">
                 <h3 className="mb-3 text-sm font-bold">Over / Under sur le total final</h3>
                 <table className="w-full">
                   <tbody>
@@ -180,7 +180,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
 
               {/* Stats live */}
               {data.hasStats && (
-                <section className="card p-5">
+                <section className="card p-4 sm:p-5">
                   <h3 className="mb-3 text-sm font-bold">Statistiques en direct</h3>
                   <StatRow label="Tirs cadrés" h={data.teams.home.shotsOnGoal} a={data.teams.away.shotsOnGoal} />
                   <StatRow label="Tirs totaux" h={data.teams.home.totalShots} a={data.teams.away.totalShots} />
@@ -248,9 +248,9 @@ function barColor(v: LiveInsight["verdict"]["moreGoals"]) {
 
 function TeamHead({ name, logo }: { name: string; logo: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 text-center">
-      {logo && <img src={logo} alt="" className="h-12 w-12 object-contain" />}
-      <span className="text-sm font-semibold leading-tight">{name}</span>
+    <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
+      {logo && <img src={logo} alt="" className="h-10 w-10 object-contain sm:h-12 sm:w-12" />}
+      <span className="w-full truncate text-xs font-semibold leading-tight sm:text-sm">{name}</span>
     </div>
   );
 }
@@ -296,8 +296,8 @@ function LiveAlerts({ d }: { d: LiveInsight }) {
   return (
     <div className="space-y-2">
       {alerts.map((a, i) => (
-        <div key={i} className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium ${a.cls}`}>
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-current" />
+        <div key={i} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium leading-snug sm:px-4 sm:py-2.5 sm:text-sm ${a.cls}`}>
+          <span className="inline-block h-2 w-2 shrink-0 animate-pulse rounded-full bg-current" />
           <span>{a.icon} {a.text}</span>
         </div>
       ))}
@@ -336,7 +336,7 @@ function PressureSection({ d }: { d: LiveInsight }) {
       : "bg-white/10 text-white/50";
 
   return (
-    <section className="card p-5">
+    <section className="card p-4 sm:p-5">
       <div className="mb-1 flex flex-wrap items-center gap-2">
         <h3 className="text-sm font-bold">⚡ Pression & dominance offensive</h3>
         <span className={`chip ${badge.cls}`}>{badge.label}</span>
@@ -358,13 +358,13 @@ function PressureSection({ d }: { d: LiveInsight }) {
           {p.pressureAway}%
         </div>
       </div>
-      <div className="mt-1 flex justify-between text-[11px] text-white/50">
-        <span className="truncate">{h.name}</span>
-        <span className="truncate">{a.name}</span>
+      <div className="mt-1 flex justify-between gap-2 text-[11px] text-white/50">
+        <span className="min-w-0 truncate">{h.name}</span>
+        <span className="min-w-0 truncate text-right">{a.name}</span>
       </div>
 
       {/* Occasions par équipe */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-1 gap-2 xs:grid-cols-2 xs:gap-3">
         <OccasionCard t={h} goals={d.score.home} />
         <OccasionCard t={a} goals={d.score.away} />
       </div>
@@ -387,7 +387,7 @@ function OccasionCard({ t, goals }: { t: TeamLiveStats; goals: number }) {
   return (
     <div className="rounded-lg border border-white/5 bg-black/20 p-3">
       <div className="mb-2 truncate text-xs font-semibold">{t.name}</div>
-      <div className="grid grid-cols-3 gap-2 text-center">
+      <div className="grid grid-cols-3 gap-1.5 text-center sm:gap-2">
         <Metric label="Occasions" value={t.chances != null ? String(t.chances) : "n/d"} />
         <Metric label="Grosses occ." value={t.bigChances != null ? String(t.bigChances) : "n/d"} />
         <Metric label={xgBadge} value={xgVal.toFixed(2)} valueCls={xgCls} />
@@ -403,9 +403,9 @@ function OccasionCard({ t, goals }: { t: TeamLiveStats; goals: number }) {
 
 function Metric({ label, value, valueCls = "" }: { label: string; value: string; valueCls?: string }) {
   return (
-    <div className="rounded-md bg-white/5 p-1.5">
+    <div className="rounded-md bg-white/5 p-1 sm:p-1.5">
       <div className="truncate text-[9px] uppercase tracking-wide text-white/40">{label}</div>
-      <div className={`text-base font-bold ${valueCls}`}>{value}</div>
+      <div className={`text-sm font-bold sm:text-base ${valueCls}`}>{value}</div>
     </div>
   );
 }

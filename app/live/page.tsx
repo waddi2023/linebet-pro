@@ -18,10 +18,10 @@ export default function LivePage() {
   const [mode, setMode] = useState<"all" | "hot">("all");
   return (
     <div className="space-y-5">
-      <section className="card p-5">
+      <section className="card p-4 sm:p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">
+            <h1 className="text-lg font-bold tracking-tight sm:text-xl">
               <span className="mr-1 inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 align-middle" /> Matchs en direct
             </h1>
             <p className="mt-1 text-sm text-white/50">
@@ -32,13 +32,13 @@ export default function LivePage() {
         <div className="mt-4 inline-flex rounded-lg border border-white/10 bg-pitch-700 p-1 text-sm">
           <button
             onClick={() => setMode("all")}
-            className={`rounded-md px-3 py-1.5 font-medium transition ${mode === "all" ? "bg-accent text-pitch-900" : "text-white/60 hover:text-white"}`}
+            className={`rounded-md px-3 py-2 font-medium transition ${mode === "all" ? "bg-accent text-pitch-900" : "text-white/60 hover:text-white"}`}
           >
             Tous
           </button>
           <button
             onClick={() => setMode("hot")}
-            className={`rounded-md px-3 py-1.5 font-medium transition ${mode === "hot" ? "bg-red-500 text-white" : "text-white/60 hover:text-white"}`}
+            className={`rounded-md px-3 py-2 font-medium transition ${mode === "hot" ? "bg-red-500 text-white" : "text-white/60 hover:text-white"}`}
           >
             🔥 Matchs chauds
           </button>
@@ -87,13 +87,13 @@ function AllList() {
         <div className="card p-8 text-center text-sm text-white/50">Aucun match en direct actuellement. ⚽</div>
       )}
       {list.map((m) => (
-        <Link key={m.id} href={`/live/${m.id}`} className="card flex items-center gap-3 p-3 transition hover:border-accent/40">
-          <span className="flex w-14 shrink-0 items-center gap-1 text-xs font-bold text-red-400">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+        <Link key={m.id} href={`/live/${m.id}`} className="card flex items-center gap-2 p-3 transition hover:border-accent/40 sm:gap-3">
+          <span className="flex w-10 shrink-0 items-center gap-1 text-[11px] font-bold text-red-400 sm:w-14 sm:text-xs">
+            <span className="hidden h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 xs:inline-block" />
             {m.elapsed != null ? `${m.elapsed}'` : m.status}
           </span>
           <Teams m={m} />
-          <span className="ml-auto hidden shrink-0 text-xs text-accent sm:inline">Analyser →</span>
+          <span className="ml-auto hidden shrink-0 text-xs text-accent lg:inline">Analyser →</span>
         </Link>
       ))}
     </div>
@@ -154,18 +154,18 @@ function HotList() {
       )}
       {data?.items.map((m, i) => (
         <Link key={m.id} href={`/live/${m.id}`} className="card block p-3 transition hover:border-red-500/40">
-          <div className="flex items-center gap-3">
-            <span className="flex w-12 shrink-0 flex-col items-center">
-              <span className="text-lg leading-none">{flames(m.heat)}</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="flex w-9 shrink-0 flex-col items-center sm:w-12">
+              <span className="text-base leading-none sm:text-lg">{flames(m.heat)}</span>
               <span className="text-[10px] font-bold text-red-400">{m.heat}</span>
             </span>
-            <span className="flex w-12 shrink-0 items-center gap-1 text-xs font-bold text-red-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+            <span className="flex w-9 shrink-0 items-center gap-1 text-[11px] font-bold text-red-400 sm:w-12 sm:text-xs">
+              <span className="hidden h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 xs:inline-block" />
               {m.elapsed != null ? `${m.elapsed}'` : m.status}
             </span>
             <Teams m={m} />
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2 pl-24 text-[11px]">
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] sm:gap-2 sm:pl-24">
             <span className="chip bg-emerald-500/10 text-emerald-300">⚽ but +{pct(m.probMore)}</span>
             {m.intensityLevel && (
               <span className="chip bg-amber-500/10 text-amber-300">Intensité {m.intensityLevel}</span>
@@ -187,15 +187,15 @@ function HotList() {
 function Teams({ m }: { m: LiveListItem }) {
   return (
     <>
-      <span className="flex flex-1 items-center justify-end gap-2 text-right text-sm">
+      <span className="flex min-w-0 flex-1 items-center justify-end gap-1.5 text-right text-xs sm:gap-2 sm:text-sm">
         <span className="truncate">{m.home.name}</span>
-        {m.home.logo && <img src={m.home.logo} alt="" className="h-5 w-5 object-contain" />}
+        {m.home.logo && <img src={m.home.logo} alt="" className="h-5 w-5 shrink-0 object-contain" />}
       </span>
       <span className="shrink-0 rounded bg-white/10 px-2 py-0.5 text-sm font-bold">
         {m.goals.home ?? 0} - {m.goals.away ?? 0}
       </span>
-      <span className="flex flex-1 items-center gap-2 text-sm">
-        {m.away.logo && <img src={m.away.logo} alt="" className="h-5 w-5 object-contain" />}
+      <span className="flex min-w-0 flex-1 items-center gap-1.5 text-xs sm:gap-2 sm:text-sm">
+        {m.away.logo && <img src={m.away.logo} alt="" className="h-5 w-5 shrink-0 object-contain" />}
         <span className="truncate">{m.away.name}</span>
       </span>
     </>
