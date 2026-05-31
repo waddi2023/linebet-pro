@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { buildLiveInsight, listLiveFixtures } from "@/lib/live";
+import { buildLiveInsight, listLiveFixtures, scanHotMatches } from "@/lib/live";
 import { hasApiKey, ApiFootballError } from "@/lib/apiFootball";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const fixture = searchParams.get("fixture");
+  const mode = searchParams.get("mode");
 
   if (!hasApiKey()) {
     return NextResponse.json(
@@ -18,6 +19,11 @@ export async function GET(req: Request) {
   }
 
   try {
+    if (mode === "hot") {
+      const limit = Number(searchParams.get("limit") || 12);
+      const scan = await scanHotMatches(limit);
+      return NextResponse.json(scan);
+    }
     if (fixture) {
       const id = Number(fixture);
       if (!id || isNaN(id)) {

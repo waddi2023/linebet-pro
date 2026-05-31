@@ -326,6 +326,34 @@ export function buildPressure(
   };
 }
 
+// Minutes restantes selon le statut (gère mi-temps / prolongations).
+export function minutesLeft(status: string, elapsed: number, live: boolean): number {
+  if (status === "HT") return 45 + 3;
+  if (status === "2H" || status === "1H") return Math.max(1, 90 + 4 - elapsed);
+  if (status === "ET" || status === "BT" || status === "P") return Math.max(1, 120 + 3 - elapsed);
+  return live ? Math.max(1, 90 - elapsed) : 0;
+}
+
+// Buts restants attendus (Poisson) à partir de la menace cumulée de chaque équipe.
+export function remainingLambdas(
+  threatHome: number,
+  threatAway: number,
+  elapsed: number,
+  minutesRemaining: number,
+  hasStats: boolean
+): { lambdaHome: number; lambdaAway: number; lambdaTotal: number } {
+  const BASE_PER_MIN = 1.25 / 90;
+  const el = Math.max(1, elapsed);
+  const w = el / (el + 20);
+  const ratePerMin = (threat: number) => {
+    const liveRate = hasStats && threat > 0 ? threat / el : BASE_PER_MIN;
+    return w * liveRate + (1 - w) * BASE_PER_MIN;
+  };
+  const lambdaHome = ratePerMin(threatHome) * minutesRemaining;
+  const lambdaAway = ratePerMin(threatAway) * minutesRemaining;
+  return { lambdaHome, lambdaAway, lambdaTotal: Math.max(0.01, lambdaHome + lambdaAway) };
+}
+
 export async function buildLiveInsight(fixtureId: number): Promise<LiveInsight> {
   const fx = await getFixtureById(fixtureId);
   if (!fx.length) throw new ApiFootballError("Match introuvable.", "EMPTY");
@@ -348,11 +376,7 @@ export async function buildLiveInsight(fixtureId: number): Promise<LiveInsight> 
     );
   }
 
-  let minutesRemaining: number;
-  if (status === "HT") minutesRemaining = 45 + 3;
-  else if (status === "2H" || status === "1H") minutesRemaining = Math.max(1, 90 + 4 - elapsed);
-  else if (status === "ET" || status === "BT" || status === "P") minutesRemaining = Math.max(1, 120 + 3 - elapsed);
-  else minutesRemaining = live ? Math.max(1, 90 - elapsed) : 0;
+  const minutesRemaining = minutesLeft(status, elapsed, live);
 
   // Statistiques en direct.
   let stats: RawTeamStats[] = [];
@@ -418,15 +442,13 @@ export async function buildLiveInsight(fixtureId: number): Promise<LiveInsight> 
   const away = mkTeam(fixture.away.name, aRaw, threatAway, pressure.pressureAway, aChances, aBig, ga);
 
   // Menace pour Poisson (xG natif ou proxy), avec base de sécurité.
-  const BASE_PER_MIN = 1.25 / 90;
-  const w = elapsed / (elapsed + 20);
-  const ratePerMin = (threat: number) => {
-    const liveRate = hasStats && threat > 0 ? threat / elapsed : BASE_PER_MIN;
-    return w * liveRate + (1 - w) * BASE_PER_MIN;
-  };
-  const lambdaHome = ratePerMin(home.threatXg) * minutesRemaining;
-  const lambdaAway = ratePerMin(away.threatXg) * minutesRemaining;
-  const lambdaTotal = Math.max(0.01, lambdaHome + lambdaAway);
+  const { lambdaHome, lambdaAway, lambdaTotal } = remainingLambdas(
+    home.threatXg,
+    away.threatXg,
+    elapsed,
+    minutesRemaining,
+    hasStats
+  );
 
   // Parts de menace cumulée (pour l'inclinaison prochain but).
   const tSum = threatHome + threatAway;
@@ -513,4 +535,107 @@ export async function listLiveFixtures(): Promise<LiveListItem[]> {
       goals: r.goals,
     }))
     .sort((a, b) => (b.elapsed ?? 0) - (a.elapsed ?? 0));
+}
+
+// ---------- Scan des matchs « chauds » ----------
+export interface HeatItem extends LiveListItem {
+  heat: number; // 0..100
+  intensityLevel: PressureModel["intensityLevel"];
+  rate10: number | null;
+  probMore: number; // proba ≥1 but d'ici la fin
+  pressureHome: number;
+  pressureAway: number;
+  pressureMargin: number;
+  leadTeam: "home" | "away" | null;
+  dataConfidence: DataConfidence;
+  hasStats: boolean;
+}
+
+export interface HeatScan {
+  scanned: number;
+  totalLive: number;
+  items: HeatItem[];
+  notes: string[];
+}
+
+const HEAT_STATUSES = new Set(["1H", "2H", "HT", "ET", "BT", "P"]);
+
+export async function scanHotMatches(limit = 12): Promise<HeatScan> {
+  const lim = Math.max(1, Math.min(limit, 20));
+  const raw = await getLiveFixtures();
+  const inPlay = raw.filter((r) => HEAT_STATUSES.has(r.fixture.status.short));
+  // On scanne en priorité les matchs entre la 10e et la 88e minute (assez de données, encore du temps).
+  const candidates = inPlay
+    .filter((r) => {
+      const e = r.fixture.status.elapsed ?? 0;
+      return e >= 10 && e <= 88;
+    })
+    .sort((a, b) => (b.fixture.status.elapsed ?? 0) - (a.fixture.status.elapsed ?? 0))
+    .slice(0, lim);
+
+  const notes: string[] = [];
+  if (inPlay.length > candidates.length) {
+    notes.push(
+      `${inPlay.length} matchs en direct — ${candidates.length} analysés en détail (1 requête stats chacun) pour préserver le quota API.`
+    );
+  }
+
+  const items: HeatItem[] = [];
+  for (const r of candidates) {
+    let stats: RawTeamStats[] = [];
+    try {
+      stats = await getFixtureStatistics(r.fixture.id);
+    } catch {
+      // on continue sans stats
+    }
+    const homeStats = stats.find((s) => s.team.id === r.teams.home.id);
+    const awayStats = stats.find((s) => s.team.id === r.teams.away.id);
+    const hasStats = !!(homeStats || awayStats);
+    const hRaw = readTeam(homeStats);
+    const aRaw = readTeam(awayStats);
+    const elapsed = Math.max(1, r.fixture.status.elapsed ?? 45);
+    const { model, threatHome, threatAway } = buildPressure(hRaw, aRaw, elapsed);
+    const minRem = minutesLeft(r.fixture.status.short, elapsed, true);
+    const noThreat = model.dataConfidence === "none";
+    const { lambdaTotal } = remainingLambdas(
+      noThreat ? 0 : threatHome,
+      noThreat ? 0 : threatAway,
+      elapsed,
+      minRem,
+      hasStats
+    );
+    const probMore = 1 - Math.exp(-lambdaTotal);
+
+    const intensityNorm = model.rate10 != null ? clamp(model.rate10 / 8, 0, 1) : 0;
+    const marginNorm = model.pressureMargin / 100;
+    const goalsTotal = (r.goals.home ?? 0) + (r.goals.away ?? 0);
+    const goalsNorm = clamp(goalsTotal / 4, 0, 1);
+    const heat = Math.round(100 * (0.4 * probMore + 0.35 * intensityNorm + 0.1 * marginNorm + 0.15 * goalsNorm));
+
+    const leadTeam: "home" | "away" | null =
+      model.pressureMargin < 15 ? null : model.pressureHome > model.pressureAway ? "home" : "away";
+
+    items.push({
+      id: r.fixture.id,
+      status: r.fixture.status.short,
+      elapsed: r.fixture.status.elapsed,
+      league: { name: r.league.name, country: r.league.country, logo: r.league.logo },
+      home: { name: r.teams.home.name, logo: r.teams.home.logo },
+      away: { name: r.teams.away.name, logo: r.teams.away.logo },
+      goals: r.goals,
+      heat,
+      intensityLevel: model.intensityLevel,
+      rate10: model.rate10,
+      probMore: round3(probMore),
+      pressureHome: model.pressureHome,
+      pressureAway: model.pressureAway,
+      pressureMargin: model.pressureMargin,
+      leadTeam,
+      dataConfidence: model.dataConfidence,
+      hasStats,
+    });
+  }
+
+  items.sort((a, b) => b.heat - a.heat);
+  return { scanned: candidates.length, totalLive: inPlay.length, items, notes };
 }

@@ -90,6 +90,8 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
             </div>
           </section>
 
+          {data.live && <LiveAlerts d={data} />}
+
           {/* VERDICT BUT SUPPLÉMENTAIRE */}
           <section className={`card p-5 ${verdictBg(data.verdict.moreGoals)}`}>
             <div className="text-xs uppercase tracking-wide text-white/50">⚽ Probabilité de but supplémentaire</div>
@@ -258,6 +260,47 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg bg-white/5 p-2.5 text-center">
       <div className="text-[10px] uppercase tracking-wide text-white/40">{label}</div>
       <div className="mt-0.5 text-lg font-bold">{value}</div>
+    </div>
+  );
+}
+
+function LiveAlerts({ d }: { d: LiveInsight }) {
+  const alerts: { icon: string; text: string; cls: string }[] = [];
+  const p = d.pressure;
+
+  if (p.dataConfidence !== "none" && p.pressureMargin >= 30) {
+    const lead = p.pressureHome > p.pressureAway ? d.teams.home : d.teams.away;
+    const val = Math.max(p.pressureHome, p.pressureAway);
+    alerts.push({
+      icon: "🔴",
+      text: `${lead.name} met une grosse pression (${val}% de dominance offensive)`,
+      cls: "border-rose-500/40 bg-rose-500/10 text-rose-200",
+    });
+  }
+  if (d.probAtLeastOneMore >= 0.7) {
+    alerts.push({
+      icon: "🔥",
+      text: `But supplémentaire très probable (${Math.round(d.probAtLeastOneMore * 100)}%) — match chaud`,
+      cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
+    });
+  }
+  if (p.intensityLevel === "Élevé") {
+    alerts.push({
+      icon: "⚡",
+      text: `Match à haute intensité (${p.rate10} tirs+corners / 10 min)`,
+      cls: "border-amber-500/40 bg-amber-500/10 text-amber-200",
+    });
+  }
+
+  if (!alerts.length) return null;
+  return (
+    <div className="space-y-2">
+      {alerts.map((a, i) => (
+        <div key={i} className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium ${a.cls}`}>
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-current" />
+          <span>{a.icon} {a.text}</span>
+        </div>
+      ))}
     </div>
   );
 }
