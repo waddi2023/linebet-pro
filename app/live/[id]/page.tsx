@@ -120,6 +120,10 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
             )}
           </section>
 
+          {data.live && data.hasStats && data.pressure.dataConfidence !== "none" && (
+            <PressureSection d={data} />
+          )}
+
           {data.live && (
             <>
               {/* Prochain but + projections */}
@@ -178,10 +182,11 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
                   <h3 className="mb-3 text-sm font-bold">Statistiques en direct</h3>
                   <StatRow label="Tirs cadrés" h={data.teams.home.shotsOnGoal} a={data.teams.away.shotsOnGoal} />
                   <StatRow label="Tirs totaux" h={data.teams.home.totalShots} a={data.teams.away.totalShots} />
-                  <StatRow label="Attaques dangereuses" h={data.teams.home.dangerousAttacks} a={data.teams.away.dangerousAttacks} />
+                  <StatRow label="Tirs dans la surface" h={data.teams.home.shotsInsidebox} a={data.teams.away.shotsInsidebox} />
+                  <StatRow label="Tirs bloqués" h={data.teams.home.blockedShots} a={data.teams.away.blockedShots} />
                   <StatRow label="Corners" h={data.teams.home.corners} a={data.teams.away.corners} />
+                  <StatRow label="Arrêts gardien" h={data.teams.home.gkSaves} a={data.teams.away.gkSaves} />
                   <StatRow label="Possession" h={Math.round(data.teams.home.possession * 100)} a={Math.round(data.teams.away.possession * 100)} suffix="%" />
-                  <StatRow label="xG estimé" h={data.teams.home.xgEstimate} a={data.teams.away.xgEstimate} />
                 </section>
               )}
             </>
@@ -253,6 +258,111 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg bg-white/5 p-2.5 text-center">
       <div className="text-[10px] uppercase tracking-wide text-white/40">{label}</div>
       <div className="mt-0.5 text-lg font-bold">{value}</div>
+    </div>
+  );
+}
+
+function confidenceBadge(c: LiveInsight["pressure"]["dataConfidence"]) {
+  switch (c) {
+    case "xg":
+      return { label: "xG réel", cls: "bg-emerald-500/15 text-emerald-300" };
+    case "shots":
+      return { label: "estimé (tirs)", cls: "bg-amber-500/15 text-amber-300" };
+    case "shots_coarse":
+      return { label: "estimé (grossier)", cls: "bg-amber-500/15 text-amber-300" };
+    case "possession":
+      return { label: "possession seule", cls: "bg-rose-500/15 text-rose-300" };
+    default:
+      return { label: "indisponible", cls: "bg-white/10 text-white/40" };
+  }
+}
+
+function PressureSection({ d }: { d: LiveInsight }) {
+  const p = d.pressure;
+  const h = d.teams.home;
+  const a = d.teams.away;
+  const badge = confidenceBadge(p.dataConfidence);
+  const intensity = p.intensityLevel
+    ? `${p.lowConfidence ? "~" : ""}${p.intensityLevel}`
+    : "—";
+  const intensityCls =
+    p.intensityLevel === "Élevé"
+      ? "bg-emerald-500/15 text-emerald-300"
+      : p.intensityLevel === "Moyen"
+      ? "bg-amber-500/15 text-amber-300"
+      : "bg-white/10 text-white/50";
+
+  return (
+    <section className="card p-5">
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <h3 className="text-sm font-bold">⚡ Pression & dominance offensive</h3>
+        <span className={`chip ${badge.cls}`}>{badge.label}</span>
+        <span className={`chip ${intensityCls}`}>Intensité {intensity}</span>
+        {p.rate10 != null && (
+          <span className="chip bg-white/5 text-white/50">{p.rate10} tirs+corners / 10′</span>
+        )}
+      </div>
+      <p className="mb-3 text-[11px] text-white/40">
+        Dominance cumulée depuis le coup d'envoi — pas le momentum des dernières minutes.
+      </p>
+
+      {/* Barre de pression relative */}
+      <div className="flex h-8 overflow-hidden rounded-lg text-xs font-semibold">
+        <div className="flex items-center justify-center bg-accent/80 text-pitch-900" style={{ width: `${p.pressureHome}%` }}>
+          {p.pressureHome}%
+        </div>
+        <div className="flex items-center justify-center bg-gold/80 text-pitch-900" style={{ width: `${p.pressureAway}%` }}>
+          {p.pressureAway}%
+        </div>
+      </div>
+      <div className="mt-1 flex justify-between text-[11px] text-white/50">
+        <span className="truncate">{h.name}</span>
+        <span className="truncate">{a.name}</span>
+      </div>
+
+      {/* Occasions par équipe */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <OccasionCard t={h} goals={d.score.home} />
+        <OccasionCard t={a} goals={d.score.away} />
+      </div>
+
+      {p.flags.length > 0 && (
+        <ul className="mt-3 list-inside list-disc space-y-0.5 text-[11px] text-white/40">
+          {p.flags.map((f, i) => (
+            <li key={i}>{f}</li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function OccasionCard({ t, goals }: { t: TeamLiveStats; goals: number }) {
+  const xgVal = t.xg != null ? t.xg : t.threatXg;
+  const xgBadge = t.xgSource === "real" ? "xG réel" : "xG estimé";
+  const xgCls = t.xgSource === "real" ? "text-emerald-300" : "text-amber-300";
+  return (
+    <div className="rounded-lg border border-white/5 bg-black/20 p-3">
+      <div className="mb-2 truncate text-xs font-semibold">{t.name}</div>
+      <div className="grid grid-cols-3 gap-2 text-center">
+        <Metric label="Occasions" value={t.chances != null ? String(t.chances) : "n/d"} />
+        <Metric label="Grosses occ." value={t.bigChances != null ? String(t.bigChances) : "n/d"} />
+        <Metric label={xgBadge} value={xgVal.toFixed(2)} valueCls={xgCls} />
+      </div>
+      {t.bigChances != null && t.bigChances > 0 && (
+        <div className="mt-2 text-center text-[10px] text-white/40">
+          Efficacité : {goals}/{t.bigChances} grosse(s) occ. converties
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Metric({ label, value, valueCls = "" }: { label: string; value: string; valueCls?: string }) {
+  return (
+    <div className="rounded-md bg-white/5 p-1.5">
+      <div className="truncate text-[9px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className={`text-base font-bold ${valueCls}`}>{value}</div>
     </div>
   );
 }
