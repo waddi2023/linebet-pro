@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { LiveInsight, TeamLiveStats } from "@/lib/live";
+import { ApiErrorCard } from "@/components/ApiErrorCard";
 
 function pct(x: number, d = 0) {
   return `${(x * 100).toFixed(d)}%`;
@@ -53,12 +54,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
       </Link>
 
       {loading && <div className="card h-64 animate-pulse bg-white/5" />}
-      {error && (
-        <div className="card border-amber-500/30 bg-amber-500/5 p-5 text-sm">
-          <p className="font-semibold text-amber-300">⚠️ Analyse impossible</p>
-          <p className="mt-1 text-white/60">{error.message}</p>
-        </div>
-      )}
+      {error && <ApiErrorCard code={error.code} message={error.message} />}
 
       {data && (
         <>

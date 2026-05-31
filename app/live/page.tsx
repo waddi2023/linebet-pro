@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import type { LiveListItem, HeatItem, HeatScan } from "@/lib/live";
+import { ApiErrorCard } from "@/components/ApiErrorCard";
 
 function pct(x: number) {
   return `${Math.round(x * 100)}%`;
@@ -203,12 +204,7 @@ function Teams({ m }: { m: LiveListItem }) {
 }
 
 function ErrorCard({ error }: { error: { code: string; message: string } }) {
-  return (
-    <div className="card border-amber-500/30 bg-amber-500/5 p-5 text-sm">
-      <p className="font-semibold text-amber-300">⚠️ {error.code === "NO_KEY" ? "Clé API manquante" : "Erreur"}</p>
-      <p className="mt-1 text-white/60">{error.message}</p>
-    </div>
-  );
+  return <ApiErrorCard code={error.code} message={error.message} />;
 }
 
 function Skeletons() {

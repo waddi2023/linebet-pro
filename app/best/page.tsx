@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { BestBetsResult, BestPick } from "@/lib/bestBets";
+import { ApiErrorCard } from "@/components/ApiErrorCard";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -76,12 +77,7 @@ export default function BestPage() {
         </p>
       </section>
 
-      {error && (
-        <div className="card border-amber-500/30 bg-amber-500/5 p-5 text-sm">
-          <p className="font-semibold text-amber-300">⚠️ {error.code === "NO_KEY" ? "Clé API manquante" : "Erreur"}</p>
-          <p className="mt-1 text-white/60">{error.message}</p>
-        </div>
-      )}
+      {error && <ApiErrorCard code={error.code} message={error.message} />}
 
       {loading && (
         <div className="space-y-3">

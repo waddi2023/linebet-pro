@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import type { FixtureLite } from "@/lib/types";
+import { ApiErrorCard } from "@/components/ApiErrorCard";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -94,21 +95,7 @@ export default function Home() {
         </Link>
       </section>
 
-      {error && (
-        <div className="card border-amber-500/30 bg-amber-500/5 p-5 text-sm">
-          <p className="font-semibold text-amber-300">⚠️ {humanError(error.code)}</p>
-          <p className="mt-1 text-white/60">{error.message}</p>
-          {error.code === "NO_KEY" && (
-            <p className="mt-2 text-white/50">
-              Ajoute la variable <code className="rounded bg-white/10 px-1">API_FOOTBALL_KEY</code> (clé gratuite sur{" "}
-              <a className="text-accent underline" href="https://dashboard.api-football.com/" target="_blank" rel="noreferrer">
-                dashboard.api-football.com
-              </a>
-              ) dans tes variables d'environnement Vercel, puis redéploie.
-            </p>
-          )}
-        </div>
-      )}
+      {error && <ApiErrorCard code={error.code} message={error.message} />}
 
       {!error && !loading && filtered.length === 0 && (
         <div className="card p-8 text-center text-sm text-white/50">
@@ -172,15 +159,4 @@ function Team({ logo, name, align }: { logo: string; name: string; align: "left"
       )}
     </span>
   );
-}
-
-function humanError(code: string) {
-  switch (code) {
-    case "NO_KEY":
-      return "Clé API-Football manquante";
-    case "NETWORK":
-      return "Erreur réseau";
-    default:
-      return "Erreur API";
-  }
 }

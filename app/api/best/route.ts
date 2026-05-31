@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { scanBestBets } from "@/lib/bestBets";
-import { hasApiKey, ApiFootballError } from "@/lib/apiFootball";
+import { hasApiKey, ApiFootballError, httpStatusForCode } from "@/lib/apiFootball";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,6 +25,7 @@ export async function GET(req: Request) {
     return NextResponse.json(result);
   } catch (e) {
     const err = e as ApiFootballError;
-    return NextResponse.json({ error: err.code ?? "HTTP", message: err.message }, { status: 502 });
+    const code = err.code ?? "HTTP";
+    return NextResponse.json({ error: code, message: err.message }, { status: httpStatusForCode(code) });
   }
 }

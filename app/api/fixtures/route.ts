@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFixturesByDate, hasApiKey, ApiFootballError } from "@/lib/apiFootball";
+import { getFixturesByDate, hasApiKey, ApiFootballError, httpStatusForCode } from "@/lib/apiFootball";
 import type { FixtureLite } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -45,9 +45,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ date, count: fixtures.length, fixtures });
   } catch (e) {
     const err = e as ApiFootballError;
-    return NextResponse.json(
-      { error: err.code ?? "HTTP", message: err.message },
-      { status: 502 }
-    );
+    const code = err.code ?? "HTTP";
+    return NextResponse.json({ error: code, message: err.message }, { status: httpStatusForCode(code) });
   }
 }

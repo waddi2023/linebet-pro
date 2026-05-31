@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { AnalysisResult, MarketRow } from "@/lib/types";
+import { ApiErrorCard } from "@/components/ApiErrorCard";
 
 export default function MatchPage({ params }: { params: { id: string } }) {
   const [data, setData] = useState<AnalysisResult | null>(null);
@@ -38,12 +39,7 @@ export default function MatchPage({ params }: { params: { id: string } }) {
 
       {loading && <Skeleton />}
 
-      {error && (
-        <div className="card border-amber-500/30 bg-amber-500/5 p-5 text-sm">
-          <p className="font-semibold text-amber-300">⚠️ Analyse impossible</p>
-          <p className="mt-1 text-white/60">{error.message}</p>
-        </div>
-      )}
+      {error && <ApiErrorCard code={error.code} message={error.message} />}
 
       {data && <Report d={data} />}
     </div>
