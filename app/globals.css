@@ -4,29 +4,51 @@
 
 :root {
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Thème clair (par défaut du :root ; le thème sombre est appliqué via .dark) */
+  --base: 244 246 250;
+  --surface: 255 255 255;
+  --elevated: 237 242 248;
+  --fg: 17 24 39;
+  --accent: 5 150 105;
+  --accent-soft: 209 250 229;
+  --gold: 180 120 0;
+  --shadow: 15 23 42;
+}
+
+.dark {
+  --base: 10 14 20;
+  --surface: 15 22 32;
+  --elevated: 22 32 47;
+  --fg: 255 255 255;
+  --accent: 34 211 166;
+  --accent-soft: 14 58 48;
+  --gold: 245 180 0;
+  --shadow: 0 0 0;
 }
 
 html,
 body {
-  background: #0a0e14;
-  color: #e6edf3;
+  background: rgb(var(--base));
+  color: rgb(var(--fg));
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-white/5 bg-pitch-800/80 shadow-lg shadow-black/30;
+    @apply rounded-2xl border border-fg/10 bg-surface shadow-lg;
+    box-shadow: 0 10px 30px -12px rgb(var(--shadow) / 0.25);
   }
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
   .th {
-    @apply px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-white/50;
+    @apply px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-fg/50;
   }
   .td {
-    @apply px-3 py-2 text-sm border-t border-white/5;
+    @apply px-3 py-2 text-sm border-t border-fg/10;
   }
   .bar {
-    @apply h-2 rounded-full bg-white/10 overflow-hidden;
+    @apply h-2 rounded-full bg-fg/10 overflow-hidden;
   }
 }
 
@@ -35,6 +57,6 @@ body {
   width: 8px;
 }
 .scroll-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgb(var(--fg) / 0.12);
   border-radius: 9999px;
 }

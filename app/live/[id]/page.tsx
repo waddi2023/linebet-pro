@@ -49,18 +49,18 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="space-y-5">
-      <Link href="/live" className="inline-block text-sm text-white/50 hover:text-accent">
+      <Link href="/live" className="inline-block text-sm text-fg/50 hover:text-accent">
         ← Matchs en direct
       </Link>
 
-      {loading && <div className="card h-64 animate-pulse bg-white/5" />}
+      {loading && <div className="card h-64 animate-pulse bg-fg/5" />}
       {error && <ApiErrorCard code={error.code} message={error.message} />}
 
       {data && (
         <>
           {/* Score & minute */}
           <section className="card p-4 sm:p-5">
-            <div className="mb-3 flex items-center justify-between gap-2 text-xs text-white/40">
+            <div className="mb-3 flex items-center justify-between gap-2 text-xs text-fg/40">
               <span className="flex min-w-0 items-center gap-2">
                 {data.fixture.league.logo && (
                   <img src={data.fixture.league.logo} alt="" className="h-4 w-4 shrink-0 object-contain" />
@@ -78,9 +78,9 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
               <TeamHead name={data.fixture.home.name} logo={data.fixture.home.logo} />
               <div className="text-center">
                 <div className="text-2xl font-black sm:text-3xl">
-                  {data.score.home} <span className="text-white/30">-</span> {data.score.away}
+                  {data.score.home} <span className="text-fg/30">-</span> {data.score.away}
                 </div>
-                {data.live && <div className="mt-1 text-[11px] text-white/40">{data.minutesRemaining}′ restantes</div>}
+                {data.live && <div className="mt-1 text-[11px] text-fg/40">{data.minutesRemaining}′ restantes</div>}
               </div>
               <TeamHead name={data.fixture.away.name} logo={data.fixture.away.logo} />
             </div>
@@ -90,7 +90,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
 
           {/* VERDICT BUT SUPPLÉMENTAIRE */}
           <section className={`card p-4 sm:p-5 ${verdictBg(data.verdict.moreGoals)}`}>
-            <div className="text-xs uppercase tracking-wide text-white/50">⚽ Probabilité de but supplémentaire</div>
+            <div className="text-xs uppercase tracking-wide text-fg/50">⚽ Probabilité de but supplémentaire</div>
             <div className="mt-1 flex flex-wrap items-end gap-3">
               <span className={`text-3xl font-black ${verdictColor(data.verdict.moreGoals)}`}>
                 {data.verdict.moreGoals}
@@ -99,7 +99,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
                 <span className="text-2xl font-bold">{pct(data.probAtLeastOneMore)}</span>
               )}
             </div>
-            <p className="mt-2 text-sm text-white/70">{data.verdict.headline}</p>
+            <p className="mt-2 text-sm text-fg/70">{data.verdict.headline}</p>
             <p className="mt-1 text-sm font-medium">{data.verdict.reco}</p>
 
             {data.live && (
@@ -110,7 +110,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
                     style={{ width: pct(data.probAtLeastOneMore) }}
                   />
                 </div>
-                <div className="mt-1 flex justify-between text-[11px] text-white/40">
+                <div className="mt-1 flex justify-between text-[11px] text-fg/40">
                   <span>≥1 but : {pct(data.probAtLeastOneMore)}</span>
                   <span>≥2 buts : {pct(data.probAtLeastTwoMore)}</span>
                 </div>
@@ -141,7 +141,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
                     {data.nextGoalLean.awayPct}%
                   </div>
                 </div>
-                <div className="mt-1 flex justify-between gap-2 text-[11px] text-white/50">
+                <div className="mt-1 flex justify-between gap-2 text-[11px] text-fg/50">
                   <span className="min-w-0 truncate">{data.fixture.home.name}</span>
                   <span className="min-w-0 truncate text-right">{data.fixture.away.name}</span>
                 </div>
@@ -160,14 +160,14 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
                   <tbody>
                     {data.ftLines.map((l) => (
                       <tr key={l.line}>
-                        <td className="td !border-white/5 text-white/60">Over {l.line}</td>
-                        <td className="td !border-white/5">
+                        <td className="td !border-fg/5 text-fg/60">Over {l.line}</td>
+                        <td className="td !border-fg/5">
                           <div className="bar">
                             <div className="h-full bg-accent" style={{ width: pct(l.over) }} />
                           </div>
                         </td>
-                        <td className="td !border-white/5 w-14 text-right font-medium">{pct(l.over)}</td>
-                        <td className="td !border-white/5 w-14 text-right text-white/50">Under {pct(l.under)}</td>
+                        <td className="td !border-fg/5 w-14 text-right font-medium">{pct(l.over)}</td>
+                        <td className="td !border-fg/5 w-14 text-right text-fg/50">Under {pct(l.under)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -191,7 +191,7 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
           )}
 
           {data.notes.length > 0 && (
-            <div className="card border-sky-500/20 bg-sky-500/5 p-4 text-xs text-white/55">
+            <div className="card border-sky-500/20 bg-sky-500/5 p-4 text-xs text-fg/55">
               <ul className="list-inside list-disc space-y-0.5">
                 {data.notes.map((n, i) => (
                   <li key={i}>{n}</li>
@@ -211,13 +211,13 @@ export default function LiveMatchPage({ params }: { params: { id: string } }) {
             >
               ↻ Rafraîchir
             </button>
-            <label className="flex items-center gap-2 text-white/60">
+            <label className="flex items-center gap-2 text-fg/60">
               <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} />
               Auto-refresh 60s
             </label>
-            {updatedAt && <span className="ml-auto text-xs text-white/30">MAJ : {updatedAt}</span>}
+            {updatedAt && <span className="ml-auto text-xs text-fg/30">MAJ : {updatedAt}</span>}
           </div>
-          <p className="text-center text-[11px] text-white/30">
+          <p className="text-center text-[11px] text-fg/30">
             Estimations probabilistes en direct — aucune certitude. Le football reste imprévisible. Jouez responsable. 18+
           </p>
         </>
@@ -253,8 +253,8 @@ function TeamHead({ name, logo }: { name: string; logo: string }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-white/5 p-2.5 text-center">
-      <div className="text-[10px] uppercase tracking-wide text-white/40">{label}</div>
+    <div className="rounded-lg bg-fg/5 p-2.5 text-center">
+      <div className="text-[10px] uppercase tracking-wide text-fg/40">{label}</div>
       <div className="mt-0.5 text-lg font-bold">{value}</div>
     </div>
   );
@@ -312,7 +312,7 @@ function confidenceBadge(c: LiveInsight["pressure"]["dataConfidence"]) {
     case "possession":
       return { label: "possession seule", cls: "bg-rose-500/15 text-rose-300" };
     default:
-      return { label: "indisponible", cls: "bg-white/10 text-white/40" };
+      return { label: "indisponible", cls: "bg-fg/10 text-fg/40" };
   }
 }
 
@@ -329,7 +329,7 @@ function PressureSection({ d }: { d: LiveInsight }) {
       ? "bg-emerald-500/15 text-emerald-300"
       : p.intensityLevel === "Moyen"
       ? "bg-amber-500/15 text-amber-300"
-      : "bg-white/10 text-white/50";
+      : "bg-fg/10 text-fg/50";
 
   return (
     <section className="card p-4 sm:p-5">
@@ -338,10 +338,10 @@ function PressureSection({ d }: { d: LiveInsight }) {
         <span className={`chip ${badge.cls}`}>{badge.label}</span>
         <span className={`chip ${intensityCls}`}>Intensité {intensity}</span>
         {p.rate10 != null && (
-          <span className="chip bg-white/5 text-white/50">{p.rate10} tirs+corners / 10′</span>
+          <span className="chip bg-fg/5 text-fg/50">{p.rate10} tirs+corners / 10′</span>
         )}
       </div>
-      <p className="mb-3 text-[11px] text-white/40">
+      <p className="mb-3 text-[11px] text-fg/40">
         Dominance cumulée depuis le coup d'envoi — pas le momentum des dernières minutes.
       </p>
 
@@ -354,7 +354,7 @@ function PressureSection({ d }: { d: LiveInsight }) {
           {p.pressureAway}%
         </div>
       </div>
-      <div className="mt-1 flex justify-between gap-2 text-[11px] text-white/50">
+      <div className="mt-1 flex justify-between gap-2 text-[11px] text-fg/50">
         <span className="min-w-0 truncate">{h.name}</span>
         <span className="min-w-0 truncate text-right">{a.name}</span>
       </div>
@@ -366,7 +366,7 @@ function PressureSection({ d }: { d: LiveInsight }) {
       </div>
 
       {p.flags.length > 0 && (
-        <ul className="mt-3 list-inside list-disc space-y-0.5 text-[11px] text-white/40">
+        <ul className="mt-3 list-inside list-disc space-y-0.5 text-[11px] text-fg/40">
           {p.flags.map((f, i) => (
             <li key={i}>{f}</li>
           ))}
@@ -381,7 +381,7 @@ function OccasionCard({ t, goals }: { t: TeamLiveStats; goals: number }) {
   const xgBadge = t.xgSource === "real" ? "xG réel" : "xG estimé";
   const xgCls = t.xgSource === "real" ? "text-emerald-300" : "text-amber-300";
   return (
-    <div className="rounded-lg border border-white/5 bg-black/20 p-3">
+    <div className="rounded-lg border border-fg/5 bg-fg/5 p-3">
       <div className="mb-2 truncate text-xs font-semibold">{t.name}</div>
       <div className="grid grid-cols-3 gap-1.5 text-center sm:gap-2">
         <Metric label="Occasions" value={t.chances != null ? String(t.chances) : "n/d"} />
@@ -389,7 +389,7 @@ function OccasionCard({ t, goals }: { t: TeamLiveStats; goals: number }) {
         <Metric label={xgBadge} value={xgVal.toFixed(2)} valueCls={xgCls} />
       </div>
       {t.bigChances != null && t.bigChances > 0 && (
-        <div className="mt-2 text-center text-[10px] text-white/40">
+        <div className="mt-2 text-center text-[10px] text-fg/40">
           Efficacité : {goals}/{t.bigChances} grosse(s) occ. converties
         </div>
       )}
@@ -399,8 +399,8 @@ function OccasionCard({ t, goals }: { t: TeamLiveStats; goals: number }) {
 
 function Metric({ label, value, valueCls = "" }: { label: string; value: string; valueCls?: string }) {
   return (
-    <div className="rounded-md bg-white/5 p-1 sm:p-1.5">
-      <div className="truncate text-[9px] uppercase tracking-wide text-white/40">{label}</div>
+    <div className="rounded-md bg-fg/5 p-1 sm:p-1.5">
+      <div className="truncate text-[9px] uppercase tracking-wide text-fg/40">{label}</div>
       <div className={`text-sm font-bold sm:text-base ${valueCls}`}>{value}</div>
     </div>
   );
@@ -412,7 +412,7 @@ function StatRow({ label, h, a, suffix = "" }: { label: string; h: number; a: nu
     <div className="py-1.5">
       <div className="flex justify-between text-xs">
         <span className="font-medium">{h}{suffix}</span>
-        <span className="text-white/40">{label}</span>
+        <span className="text-fg/40">{label}</span>
         <span className="font-medium">{a}{suffix}</span>
       </div>
       <div className="mt-1 flex h-1.5 gap-0.5">

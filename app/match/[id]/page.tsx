@@ -33,7 +33,7 @@ export default function MatchPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="space-y-5">
-      <Link href="/" className="inline-block text-sm text-white/50 hover:text-accent">
+      <Link href="/" className="inline-block text-sm text-fg/50 hover:text-accent">
         ← Retour aux matchs
       </Link>
 
@@ -49,9 +49,9 @@ export default function MatchPage({ params }: { params: { id: string } }) {
 function Skeleton() {
   return (
     <div className="space-y-4">
-      <div className="card h-28 animate-pulse bg-white/5" />
-      <div className="card h-40 animate-pulse bg-white/5" />
-      <div className="card h-64 animate-pulse bg-white/5" />
+      <div className="card h-28 animate-pulse bg-fg/5" />
+      <div className="card h-40 animate-pulse bg-fg/5" />
+      <div className="card h-64 animate-pulse bg-fg/5" />
     </div>
   );
 }
@@ -75,19 +75,19 @@ function Report({ d }: { d: AnalysisResult }) {
       {/* En-tête */}
       <section className="card p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2 sm:gap-3">
-          <div className="flex min-w-0 items-center gap-2 text-xs text-white/50">
+          <div className="flex min-w-0 items-center gap-2 text-xs text-fg/50">
             {f.league.logo && <img src={f.league.logo} alt="" className="h-4 w-4 shrink-0 object-contain" />}
             <span className="truncate">
               {f.league.country} · {f.league.name} {f.league.round ? `· ${f.league.round}` : ""}
             </span>
           </div>
-          <span className="shrink-0 text-[11px] text-white/40 sm:text-xs">{kickoff}</span>
+          <span className="shrink-0 text-[11px] text-fg/40 sm:text-xs">{kickoff}</span>
         </div>
         <div className="mt-4 grid grid-cols-3 items-center gap-1 sm:gap-2">
           <TeamBig logo={f.home.name ? f.home.logo : ""} name={f.home.name} />
           <div className="text-center">
-            <div className="text-xl font-black text-white/80 sm:text-2xl">VS</div>
-            <div className="mt-1 text-[11px] text-white/40">
+            <div className="text-xl font-black text-fg/80 sm:text-2xl">VS</div>
+            <div className="mt-1 text-[11px] text-fg/40">
               xG {d.expectedGoals.home} – {d.expectedGoals.away}
             </div>
           </div>
@@ -97,13 +97,13 @@ function Report({ d }: { d: AnalysisResult }) {
 
       {/* Disponibilité des données */}
       {d.dataAvailability.notes.length > 0 && (
-        <section className="card border-sky-500/20 bg-sky-500/5 p-4 text-xs text-white/60">
+        <section className="card border-sky-500/20 bg-sky-500/5 p-4 text-xs text-fg/60">
           <div className="mb-1 flex flex-wrap gap-2">
             <Avail ok={d.dataAvailability.predictions} label="Prédictions" />
             <Avail ok={d.dataAvailability.odds} label="Cotes" />
             <Avail ok={d.dataAvailability.scorers} label="Buteurs" />
           </div>
-          <ul className="list-inside list-disc space-y-0.5 text-white/50">
+          <ul className="list-inside list-disc space-y-0.5 text-fg/50">
             {d.dataAvailability.notes.map((n, i) => (
               <li key={i}>{n}</li>
             ))}
@@ -119,7 +119,7 @@ function Report({ d }: { d: AnalysisResult }) {
           {d.prob1x2Api ? (
             <MiniTriple title="Prédictions API-Football" t={d.prob1x2Api} />
           ) : (
-            <div className="rounded-lg border border-white/5 p-3 text-xs text-white/40">
+            <div className="rounded-lg border border-fg/5 p-3 text-xs text-fg/40">
               Prédictions API-Football indisponibles pour ce match.
             </div>
           )}
@@ -130,39 +130,39 @@ function Report({ d }: { d: AnalysisResult }) {
       <Section title="② Simulation — 10 000 matchs" subtitle={`Score moyen ${d.simulation.avgScore.home} – ${d.simulation.avgScore.away}`}>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg/40">
               Scores les plus probables
             </h4>
             <ul className="space-y-1.5">
               {d.simulation.topScores.map((s, i) => (
                 <li key={s.score} className="flex items-center gap-2">
-                  <span className="w-6 text-xs text-white/40">{i + 1}.</span>
+                  <span className="w-6 text-xs text-fg/40">{i + 1}.</span>
                   <span className="w-12 font-mono text-sm">{s.score}</span>
                   <div className="bar flex-1">
                     <div className="h-full bg-accent" style={{ width: pct(s.prob / d.simulation.topScores[0].prob) }} />
                   </div>
-                  <span className="w-12 text-right text-xs text-white/60">{pct(s.prob, 1)}</span>
+                  <span className="w-12 text-right text-xs text-fg/60">{pct(s.prob, 1)}</span>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/40">Over / Under & BTTS</h4>
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg/40">Over / Under & BTTS</h4>
             <table className="w-full">
               <tbody>
                 {d.simulation.overUnder.map((o) => (
                   <tr key={o.line}>
-                    <td className="td !border-white/5 text-white/60">Over {o.line}</td>
-                    <td className="td !border-white/5 text-right font-medium">{pct(o.over, 1)}</td>
-                    <td className="td !border-white/5 text-white/60">Under {o.line}</td>
-                    <td className="td !border-white/5 text-right font-medium">{pct(o.under, 1)}</td>
+                    <td className="td !border-fg/5 text-fg/60">Over {o.line}</td>
+                    <td className="td !border-fg/5 text-right font-medium">{pct(o.over, 1)}</td>
+                    <td className="td !border-fg/5 text-fg/60">Under {o.line}</td>
+                    <td className="td !border-fg/5 text-right font-medium">{pct(o.under, 1)}</td>
                   </tr>
                 ))}
                 <tr>
-                  <td className="td !border-white/5 text-white/60">BTTS Oui</td>
-                  <td className="td !border-white/5 text-right font-medium">{pct(d.simulation.btts, 1)}</td>
-                  <td className="td !border-white/5 text-white/60">BTTS Non</td>
-                  <td className="td !border-white/5 text-right font-medium">{pct(1 - d.simulation.btts, 1)}</td>
+                  <td className="td !border-fg/5 text-fg/60">BTTS Oui</td>
+                  <td className="td !border-fg/5 text-right font-medium">{pct(d.simulation.btts, 1)}</td>
+                  <td className="td !border-fg/5 text-fg/60">BTTS Non</td>
+                  <td className="td !border-fg/5 text-right font-medium">{pct(1 - d.simulation.btts, 1)}</td>
                 </tr>
               </tbody>
             </table>
@@ -192,8 +192,8 @@ function Report({ d }: { d: AnalysisResult }) {
           </table>
         </div>
         {d.apiAdvice && (
-          <p className="mt-3 text-xs text-white/50">
-            💡 Conseil API-Football : <span className="text-white/70">{d.apiAdvice}</span>
+          <p className="mt-3 text-xs text-fg/50">
+            💡 Conseil API-Football : <span className="text-fg/70">{d.apiAdvice}</span>
           </p>
         )}
       </Section>
@@ -204,15 +204,15 @@ function Report({ d }: { d: AnalysisResult }) {
           <ol className="space-y-1.5">
             {d.scorers.map((s, i) => (
               <li key={i} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
-                <span className="w-5 shrink-0 text-white/40">{i + 1}.</span>
+                <span className="w-5 shrink-0 text-fg/40">{i + 1}.</span>
                 <span className="font-medium">{s.name}</span>
-                <span className="text-xs text-white/40">{s.team}</span>
-                <span className="ml-auto shrink-0 text-xs text-white/60">{s.goalsSeason ?? "?"} buts</span>
+                <span className="text-xs text-fg/40">{s.team}</span>
+                <span className="ml-auto shrink-0 text-xs text-fg/60">{s.goalsSeason ?? "?"} buts</span>
               </li>
             ))}
           </ol>
         ) : (
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-fg/40">
             Données indisponibles — les buteurs probables nécessitent les compositions officielles (~1h avant le match).
           </p>
         )}
@@ -232,11 +232,11 @@ function Report({ d }: { d: AnalysisResult }) {
             ["Marché des cotes", d.confidence.marche, 5],
           ].map(([label, val, max]) => (
             <div key={label as string} className="flex items-center gap-2">
-              <span className="w-28 shrink-0 text-xs text-white/50 sm:w-40">{label}</span>
+              <span className="w-28 shrink-0 text-xs text-fg/50 sm:w-40">{label}</span>
               <div className="bar flex-1">
                 <div className="h-full bg-gold" style={{ width: `${((val as number) / (max as number)) * 100}%` }} />
               </div>
-              <span className="w-14 text-right text-xs text-white/60">
+              <span className="w-14 text-right text-xs text-fg/60">
                 {val}/{max}
               </span>
             </div>
@@ -253,17 +253,17 @@ function Report({ d }: { d: AnalysisResult }) {
           <VerdictItem icon="🥉" label="Value bet" value={d.verdict.valueBet} />
           <VerdictItem icon="⚠️" label="Risque principal" value={d.verdict.risquePrincipal} />
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-fg/10 pt-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-white/50">Confiance globale</span>
+            <span className="text-xs text-fg/50">Confiance globale</span>
             <span className="text-2xl font-black text-accent">{d.verdict.confianceGlobale}</span>
-            <span className="text-xs text-white/40">/100</span>
+            <span className="text-xs text-fg/40">/100</span>
           </div>
-          <div className="rounded-lg bg-white/5 px-3 py-1.5 text-xs sm:ml-auto">
-            💰 Mise recommandée : <span className="font-semibold text-white/80">{d.verdict.miseRecommandee}</span>
+          <div className="rounded-lg bg-fg/5 px-3 py-1.5 text-xs sm:ml-auto">
+            💰 Mise recommandée : <span className="font-semibold text-fg/80">{d.verdict.miseRecommandee}</span>
           </div>
         </div>
-        <p className="mt-3 text-[11px] text-white/30">
+        <p className="mt-3 text-[11px] text-fg/30">
           Aucun pari n'est garanti. Cette analyse vise la rentabilité long terme, pas la certitude. Jouez responsable. 18+
         </p>
       </section>
@@ -279,14 +279,14 @@ function MarketTr({ m }: { m: MarketRow }) {
       ? "text-accent"
       : m.rating === "Faible"
       ? "text-amber-400"
-      : "text-white/40";
+      : "text-fg/40";
   return (
     <tr>
-      <td className="td text-white/60">{m.market}</td>
+      <td className="td text-fg/60">{m.market}</td>
       <td className="td font-medium">{m.pick}</td>
       <td className="td text-right">{pct(m.prob, 1)}</td>
       <td className="td text-right">{m.odd ? m.odd.toFixed(2) : "—"}</td>
-      <td className={`td text-right ${m.value != null && m.value > 0 ? "text-emerald-400" : "text-white/40"}`}>
+      <td className={`td text-right ${m.value != null && m.value > 0 ? "text-emerald-400" : "text-fg/40"}`}>
         {m.value != null ? `${m.value > 0 ? "+" : ""}${(m.value * 100).toFixed(1)}%` : "—"}
       </td>
       <td className={`td ${color}`}>{m.rating ?? "—"}</td>
@@ -296,8 +296,8 @@ function MarketTr({ m }: { m: MarketRow }) {
 
 function VerdictItem({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-black/20 p-3">
-      <div className="text-xs text-white/40">
+    <div className="rounded-lg bg-fg/5 p-3">
+      <div className="text-xs text-fg/40">
         {icon} {label}
       </div>
       <div className="mt-0.5 text-sm font-medium">{value}</div>
@@ -310,7 +310,7 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
     <section className="card p-4 sm:p-5">
       <div className="mb-4">
         <h3 className="text-sm font-bold tracking-tight">{title}</h3>
-        {subtitle && <p className="text-xs text-white/40">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-fg/40">{subtitle}</p>}
       </div>
       {children}
     </section>
@@ -324,14 +324,14 @@ function ProbTripleBar({ t, home, away }: { t: { home: number; draw: number; awa
         <div className="flex items-center justify-center overflow-hidden bg-accent/80 text-pitch-900" style={{ width: pct(t.home) }}>
           {pct(t.home)}
         </div>
-        <div className="flex items-center justify-center overflow-hidden bg-white/15" style={{ width: pct(t.draw) }}>
+        <div className="flex items-center justify-center overflow-hidden bg-fg/15" style={{ width: pct(t.draw) }}>
           {pct(t.draw)}
         </div>
         <div className="flex items-center justify-center overflow-hidden bg-gold/80 text-pitch-900" style={{ width: pct(t.away) }}>
           {pct(t.away)}
         </div>
       </div>
-      <div className="mt-1 flex justify-between text-[11px] text-white/50">
+      <div className="mt-1 flex justify-between text-[11px] text-fg/50">
         <span className="truncate">1 · {home}</span>
         <span>N · Nul</span>
         <span className="truncate">2 · {away}</span>
@@ -342,20 +342,20 @@ function ProbTripleBar({ t, home, away }: { t: { home: number; draw: number; awa
 
 function MiniTriple({ title, t }: { title: string; t: { home: number; draw: number; away: number } }) {
   return (
-    <div className="rounded-lg border border-white/5 p-3">
-      <div className="mb-2 text-xs font-semibold text-white/50">{title}</div>
+    <div className="rounded-lg border border-fg/5 p-3">
+      <div className="mb-2 text-xs font-semibold text-fg/50">{title}</div>
       <div className="grid grid-cols-3 gap-2 text-center text-sm">
         <div>
           <div className="font-bold text-accent">{pct(t.home)}</div>
-          <div className="text-[10px] text-white/40">1</div>
+          <div className="text-[10px] text-fg/40">1</div>
         </div>
         <div>
           <div className="font-bold">{pct(t.draw)}</div>
-          <div className="text-[10px] text-white/40">N</div>
+          <div className="text-[10px] text-fg/40">N</div>
         </div>
         <div>
           <div className="font-bold text-gold">{pct(t.away)}</div>
-          <div className="text-[10px] text-white/40">2</div>
+          <div className="text-[10px] text-fg/40">2</div>
         </div>
       </div>
     </div>
@@ -373,7 +373,7 @@ function TeamBig({ logo, name }: { logo: string; name: string }) {
 
 function Avail({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <span className={`chip ${ok ? "bg-emerald-500/15 text-emerald-300" : "bg-white/10 text-white/40"}`}>
+    <span className={`chip ${ok ? "bg-emerald-500/15 text-emerald-300" : "bg-fg/10 text-fg/40"}`}>
       {ok ? "✓" : "—"} {label}
     </span>
   );

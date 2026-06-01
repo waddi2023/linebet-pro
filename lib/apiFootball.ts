@@ -225,3 +225,29 @@ export interface RawTopScorer {
 export async function getTopScorers(league: number, season: number): Promise<RawTopScorer[]> {
   return apiGet<RawTopScorer[]>("/players/topscorers", { league, season });
 }
+
+// ---------- Statut du compte / quota ----------
+// Note : /status ne consomme PAS le quota quotidien (non décompté par api-sports).
+export interface AccountStatus {
+  current: number;
+  limit: number;
+  remaining: number;
+  plan: string;
+  active: boolean;
+}
+
+export async function getStatus(): Promise<AccountStatus> {
+  const r = await apiGet<{
+    subscription: { plan: string; active: boolean };
+    requests: { current: number; limit_day: number };
+  }>("/status", {});
+  const current = r.requests?.current ?? 0;
+  const limit = r.requests?.limit_day ?? 100;
+  return {
+    current,
+    limit,
+    remaining: Math.max(0, limit - current),
+    plan: r.subscription?.plan ?? "Free",
+    active: r.subscription?.active ?? false,
+  };
+}

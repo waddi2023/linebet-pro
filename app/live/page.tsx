@@ -25,21 +25,21 @@ export default function LivePage() {
             <h1 className="text-lg font-bold tracking-tight sm:text-xl">
               <span className="mr-1 inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 align-middle" /> Matchs en direct
             </h1>
-            <p className="mt-1 text-sm text-white/50">
-              Pression, occasions et <span className="text-white/70">probabilité de but supplémentaire</span> en temps réel.
+            <p className="mt-1 text-sm text-fg/50">
+              Pression, occasions et <span className="text-fg/70">probabilité de but supplémentaire</span> en temps réel.
             </p>
           </div>
         </div>
-        <div className="mt-4 inline-flex rounded-lg border border-white/10 bg-pitch-700 p-1 text-sm">
+        <div className="mt-4 inline-flex rounded-lg border border-fg/10 bg-elevated p-1 text-sm">
           <button
             onClick={() => setMode("all")}
-            className={`rounded-md px-3 py-2 font-medium transition ${mode === "all" ? "bg-accent text-pitch-900" : "text-white/60 hover:text-white"}`}
+            className={`rounded-md px-3 py-2 font-medium transition ${mode === "all" ? "bg-accent text-pitch-900" : "text-fg/60 hover:text-fg"}`}
           >
             Tous
           </button>
           <button
             onClick={() => setMode("hot")}
-            className={`rounded-md px-3 py-2 font-medium transition ${mode === "hot" ? "bg-red-500 text-white" : "text-white/60 hover:text-white"}`}
+            className={`rounded-md px-3 py-2 font-medium transition ${mode === "hot" ? "bg-red-500 text-fg" : "text-fg/60 hover:text-fg"}`}
           >
             🔥 Matchs chauds
           </button>
@@ -85,7 +85,7 @@ function AllList() {
       {error && <ErrorCard error={error} />}
       {loading && <Skeletons />}
       {!loading && !error && list.length === 0 && (
-        <div className="card p-8 text-center text-sm text-white/50">Aucun match en direct actuellement. ⚽</div>
+        <div className="card p-8 text-center text-sm text-fg/50">Aucun match en direct actuellement. ⚽</div>
       )}
       {list.map((m) => (
         <Link key={m.id} href={`/live/${m.id}`} className="card flex items-center gap-2 p-3 transition hover:border-accent/40 sm:gap-3">
@@ -130,16 +130,16 @@ function HotList() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-fg/40">
           Classement par « chaleur » : intensité + proba de but + dominance. ⚠️ {limit} requêtes (plan gratuit : 10/min, scan plafonné à 8).
         </p>
         <div className="flex items-center gap-2">
-          <select value={limit} onChange={(e) => setLimit(Number(e.target.value))} className="rounded-lg border border-white/10 bg-pitch-700 px-2 py-1.5 text-sm">
+          <select value={limit} onChange={(e) => setLimit(Number(e.target.value))} className="rounded-lg border border-fg/10 bg-elevated px-2 py-1.5 text-sm">
             {[4, 6, 8].map((n) => (
               <option key={n} value={n}>{n} matchs</option>
             ))}
           </select>
-          <button onClick={() => scan(limit)} disabled={loading} className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50">
+          <button onClick={() => scan(limit)} disabled={loading} className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-semibold text-fg transition hover:brightness-110 disabled:opacity-50">
             {loading ? "Scan…" : "↻ Scanner"}
           </button>
         </div>
@@ -148,10 +148,10 @@ function HotList() {
       {error && <ErrorCard error={error} />}
       {loading && <Skeletons />}
       {data?.notes?.map((n, i) => (
-        <p key={i} className="text-[11px] text-white/40">{n}</p>
+        <p key={i} className="text-[11px] text-fg/40">{n}</p>
       ))}
       {data && !loading && data.items.length === 0 && (
-        <div className="card p-8 text-center text-sm text-white/50">Aucun match analysable en direct (10′–88′). ⚽</div>
+        <div className="card p-8 text-center text-sm text-fg/50">Aucun match analysable en direct (10′–88′). ⚽</div>
       )}
       {data?.items.map((m, i) => (
         <Link key={m.id} href={`/live/${m.id}`} className="card block p-3 transition hover:border-red-500/40">
@@ -172,11 +172,11 @@ function HotList() {
               <span className="chip bg-amber-500/10 text-amber-300">Intensité {m.intensityLevel}</span>
             )}
             {m.leadTeam && (
-              <span className="chip bg-white/5 text-white/60">
+              <span className="chip bg-fg/5 text-fg/60">
                 Pression {m.leadTeam === "home" ? m.home.name : m.away.name} {Math.max(m.pressureHome, m.pressureAway)}%
               </span>
             )}
-            {!m.hasStats && <span className="chip bg-white/5 text-white/40">stats n/d</span>}
+            {!m.hasStats && <span className="chip bg-fg/5 text-fg/40">stats n/d</span>}
             <span className="ml-auto text-accent">Analyser →</span>
           </div>
         </Link>
@@ -192,7 +192,7 @@ function Teams({ m }: { m: LiveListItem }) {
         <span className="truncate">{m.home.name}</span>
         {m.home.logo && <img src={m.home.logo} alt="" className="h-5 w-5 shrink-0 object-contain" />}
       </span>
-      <span className="shrink-0 rounded bg-white/10 px-2 py-0.5 text-sm font-bold">
+      <span className="shrink-0 rounded bg-fg/10 px-2 py-0.5 text-sm font-bold">
         {m.goals.home ?? 0} - {m.goals.away ?? 0}
       </span>
       <span className="flex min-w-0 flex-1 items-center gap-1.5 text-xs sm:gap-2 sm:text-sm">
@@ -211,7 +211,7 @@ function Skeletons() {
   return (
     <div className="space-y-3">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="card h-16 animate-pulse bg-white/5" />
+        <div key={i} className="card h-16 animate-pulse bg-fg/5" />
       ))}
     </div>
   );

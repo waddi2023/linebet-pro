@@ -61,7 +61,7 @@ export default function Home() {
     <div className="space-y-5 sm:space-y-6">
       <section className="card p-4 sm:p-5">
         <h1 className="text-lg font-bold tracking-tight sm:text-xl">Analyse de match EV+</h1>
-        <p className="mt-1 text-sm text-white/50">
+        <p className="mt-1 text-sm text-fg/50">
           Choisis une date, sélectionne un match, et l'agent produit l'analyse complète : probabilités 1X2,
           simulation de 10 000 matchs, marchés, value bets et score de confiance.
         </p>
@@ -70,16 +70,16 @@ export default function Home() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="rounded-lg border border-white/10 bg-pitch-700 px-3 py-2 text-sm outline-none focus:border-accent"
+            className="rounded-lg border border-fg/10 bg-elevated px-3 py-2 text-sm outline-none focus:border-accent"
           />
           <input
             type="text"
             placeholder="Filtrer (équipe, championnat, pays)…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-pitch-700 px-3 py-2 text-sm outline-none focus:border-accent sm:min-w-[220px] sm:flex-1"
+            className="w-full rounded-lg border border-fg/10 bg-elevated px-3 py-2 text-sm outline-none focus:border-accent sm:min-w-[220px] sm:flex-1"
           />
-          <span className="text-xs text-white/40">
+          <span className="text-xs text-fg/40">
             {loading ? "Chargement…" : `${filtered.length} match(s)`}
           </span>
         </div>
@@ -90,7 +90,7 @@ export default function Home() {
           <span className="text-lg sm:text-xl">🔥</span>
           <span className="text-xs sm:text-sm">
             <span className="font-semibold text-accent">Tu ne sais pas sur quoi parier ?</span>
-            <span className="text-white/60"> Laisse l'agent choisir les meilleurs matchs du jour →</span>
+            <span className="text-fg/60"> Laisse l'agent choisir les meilleurs matchs du jour →</span>
           </span>
         </Link>
       </section>
@@ -98,7 +98,7 @@ export default function Home() {
       {error && <ApiErrorCard code={error.code} message={error.message} />}
 
       {!error && !loading && filtered.length === 0 && (
-        <div className="card p-8 text-center text-sm text-white/50">
+        <div className="card p-8 text-center text-sm text-fg/50">
           Aucun match pour cette date / ce filtre.
         </div>
       )}
@@ -106,7 +106,7 @@ export default function Home() {
       <div className="space-y-5">
         {Object.entries(groups).map(([league, list]) => (
           <section key={league} className="card overflow-hidden">
-            <div className="flex items-center gap-2 border-b border-white/5 bg-pitch-700/40 px-4 py-2">
+            <div className="flex items-center gap-2 border-b border-fg/5 bg-elevated/40 px-4 py-2">
               {list[0].league.logo && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={list[0].league.logo} alt="" className="h-5 w-5 object-contain" />
@@ -118,16 +118,16 @@ export default function Home() {
                 <li key={f.id}>
                   <Link
                     href={`/match/${f.id}`}
-                    className="flex items-center gap-2 px-3 py-3 transition hover:bg-white/5 sm:gap-3 sm:px-4"
+                    className="flex items-center gap-2 px-3 py-3 transition hover:bg-fg/5 sm:gap-3 sm:px-4"
                   >
-                    <span className="w-10 shrink-0 text-[11px] text-white/40 sm:w-12 sm:text-xs">
+                    <span className="w-10 shrink-0 text-[11px] text-fg/40 sm:w-12 sm:text-xs">
                       {new Date(f.timestamp * 1000).toLocaleTimeString("fr-FR", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
                     </span>
                     <Team logo={f.home.logo} name={f.home.name} align="right" />
-                    <span className="shrink-0 rounded bg-white/5 px-2 py-0.5 text-xs text-white/60">
+                    <span className="shrink-0 rounded bg-fg/5 px-2 py-0.5 text-xs text-fg/60">
                       {f.goalsHome != null ? `${f.goalsHome}-${f.goalsAway}` : "vs"}
                     </span>
                     <Team logo={f.away.logo} name={f.away.name} align="left" />
