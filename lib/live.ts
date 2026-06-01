@@ -561,7 +561,8 @@ export interface HeatScan {
 const HEAT_STATUSES = new Set(["1H", "2H", "HT", "ET", "BT", "P"]);
 
 export async function scanHotMatches(limit = 12): Promise<HeatScan> {
-  const lim = Math.max(1, Math.min(limit, 20));
+  // Plafonné à 8 : 1 requête live + 8 stats = 9, sous la limite gratuite de 10 req/min.
+  const lim = Math.max(1, Math.min(limit, 8));
   const raw = await getLiveFixtures();
   const inPlay = raw.filter((r) => HEAT_STATUSES.has(r.fixture.status.short));
   // On scanne en priorité les matchs entre la 10e et la 88e minute (assez de données, encore du temps).

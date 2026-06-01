@@ -105,7 +105,7 @@ function HotList() {
   const [data, setData] = useState<HeatScan | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<{ code: string; message: string } | null>(null);
-  const [limit, setLimit] = useState(12);
+  const [limit, setLimit] = useState(8);
 
   const scan = useCallback(async (lim: number) => {
     setLoading(true);
@@ -131,11 +131,11 @@ function HotList() {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-white/40">
-          Classement par « chaleur » : intensité + proba de but + dominance. ⚠️ {limit} requêtes API par scan.
+          Classement par « chaleur » : intensité + proba de but + dominance. ⚠️ {limit} requêtes (plan gratuit : 10/min, scan plafonné à 8).
         </p>
         <div className="flex items-center gap-2">
           <select value={limit} onChange={(e) => setLimit(Number(e.target.value))} className="rounded-lg border border-white/10 bg-pitch-700 px-2 py-1.5 text-sm">
-            {[8, 12, 16, 20].map((n) => (
+            {[4, 6, 8].map((n) => (
               <option key={n} value={n}>{n} matchs</option>
             ))}
           </select>

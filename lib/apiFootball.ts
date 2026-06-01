@@ -43,6 +43,24 @@ const QUOTA_MESSAGE =
 const SUSPENDED_MESSAGE =
   "Le compte API-Football est suspendu (blocage au niveau du compte, ≠ quota quotidien). Connecte-toi à dashboard.api-football.com pour voir la raison et le réactiver.";
 
+// ---------- Limiteur de débit ----------
+// Le plan gratuit autorise 10 requêtes/MINUTE. On reste sous 9 pour garder une marge :
+// dépasser cette limite de façon répétée peut faire SUSPENDRE le compte.
+const RL_MAX = 9;
+const RL_WINDOW_MS = 60_000;
+let rlTimestamps: number[] = [];
+
+async function rateLimitGate(): Promise<void> {
+  const now = Date.now();
+  rlTimestamps = rlTimestamps.filter((t) => now - t < RL_WINDOW_MS);
+  if (rlTimestamps.length >= RL_MAX) {
+    const wait = RL_WINDOW_MS - (now - rlTimestamps[0]) + 50;
+    await new Promise((r) => setTimeout(r, wait));
+    return rateLimitGate();
+  }
+  rlTimestamps.push(Date.now());
+}
+
 interface ApiResponse<T> {
   response: T;
   errors: unknown;
@@ -72,6 +90,7 @@ async function apiGet<T>(path: string, params: Record<string, string | number>):
       }
     : { "x-apisports-key": KEY };
 
+  await rateLimitGate(); // respecte la limite gratuite de 10 req/min
   const res = await fetch(url, { headers, next: { revalidate: 120 } });
   if (!res.ok) {
     const body = await res.text().catch(() => "");

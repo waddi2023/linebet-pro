@@ -14,7 +14,7 @@ function pct(x: number, d = 0) {
 
 export default function BestPage() {
   const [date, setDate] = useState(todayISO());
-  const [scan, setScan] = useState(12);
+  const [scan, setScan] = useState(8);
   const [data, setData] = useState<BestBetsResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<{ code: string; message: string } | null>(null);
@@ -57,7 +57,7 @@ export default function BestPage() {
               onChange={(e) => setScan(Number(e.target.value))}
               className="rounded-lg border border-white/10 bg-pitch-700 px-2 py-2 text-sm outline-none focus:border-accent"
             >
-              {[6, 10, 12, 15, 20].map((n) => (
+              {[4, 6, 8].map((n) => (
                 <option key={n} value={n}>
                   {n}
                 </option>
@@ -73,7 +73,7 @@ export default function BestPage() {
           </button>
         </div>
         <p className="mt-2 text-[11px] text-white/30">
-          ⚠️ Chaque match scanné = 1 requête API (quota gratuit : 100/jour). Le scan en consomme {scan} + 1.
+          ⚠️ Chaque match scanné = 1 requête API. Plan gratuit : 10 req/min et 100/jour — scan plafonné à 8 pour rester dans les limites.
         </p>
       </section>
 

@@ -119,7 +119,8 @@ export async function scanBestBets(
   date: string,
   opts: { scanLimit?: number; returnN?: number; leagueId?: number } = {}
 ): Promise<BestBetsResult> {
-  const scanLimit = Math.max(1, Math.min(opts.scanLimit ?? 12, 20));
+  // Plafonné à 8 : 1 requête fixtures + 8 prédictions = 9, sous la limite gratuite de 10 req/min.
+  const scanLimit = Math.max(1, Math.min(opts.scanLimit ?? 8, 8));
   const returnN = Math.max(1, Math.min(opts.returnN ?? 8, 20));
   const notes: string[] = [];
 
