@@ -4,7 +4,7 @@
 const HOST = process.env.API_FOOTBALL_HOST || "https://v3.football.api-sports.io";
 const KEY = process.env.API_FOOTBALL_KEY || "";
 
-export type ApiErrorCode = "NO_KEY" | "HTTP" | "EMPTY" | "QUOTA";
+export type ApiErrorCode = "NO_KEY" | "HTTP" | "EMPTY" | "QUOTA" | "SUSPENDED";
 
 export class ApiFootballError extends Error {
   constructor(message: string, public code: ApiErrorCode = "HTTP") {
@@ -20,14 +20,19 @@ export function hasApiKey(): boolean {
 // Statut HTTP à renvoyer côté route selon le type d'erreur.
 export function httpStatusForCode(code: ApiErrorCode): number {
   if (code === "QUOTA") return 429;
+  if (code === "SUSPENDED") return 403;
   if (code === "NO_KEY") return 503;
   return 502;
 }
 
-// Détecte une erreur de quota / compte suspendu / rate-limit (≠ restriction de date).
+// Compte suspendu : blocage AU NIVEAU DU COMPTE (≠ quota quotidien, ne se réinitialise pas tout seul).
+function isSuspendedError(raw: string): boolean {
+  return raw.toLowerCase().includes("suspend");
+}
+
+// Rate-limit / quota quotidien dépassé (se réinitialise automatiquement).
 function isQuotaError(raw: string): boolean {
   const t = raw.toLowerCase();
-  if (t.includes("suspend")) return true; // compte suspendu (souvent quota dépassé)
   if (t.includes("too many request") || t.includes("ratelimit") || t.includes("rate limit")) return true;
   if (t.includes("request") && (t.includes("exceed") || t.includes("reached") || t.includes("per day") || t.includes("daily") || t.includes("per minute"))) return true;
   return false;
@@ -35,6 +40,8 @@ function isQuotaError(raw: string): boolean {
 
 const QUOTA_MESSAGE =
   "Quota quotidien de l'API atteint (plan gratuit : 100 requêtes/jour). Le quota se réinitialise automatiquement chaque jour — réessaie plus tard.";
+const SUSPENDED_MESSAGE =
+  "Le compte API-Football est suspendu (blocage au niveau du compte, ≠ quota quotidien). Connecte-toi à dashboard.api-football.com pour voir la raison et le réactiver.";
 
 interface ApiResponse<T> {
   response: T;
@@ -67,10 +74,10 @@ async function apiGet<T>(path: string, params: Record<string, string | number>):
 
   const res = await fetch(url, { headers, next: { revalidate: 120 } });
   if (!res.ok) {
-    // 429 = trop de requêtes (quota dépassé).
-    if (res.status === 429) throw new ApiFootballError(QUOTA_MESSAGE, "QUOTA");
     const body = await res.text().catch(() => "");
-    if (isQuotaError(body)) throw new ApiFootballError(QUOTA_MESSAGE, "QUOTA");
+    if (isSuspendedError(body)) throw new ApiFootballError(SUSPENDED_MESSAGE, "SUSPENDED");
+    // 429 = trop de requêtes (quota dépassé).
+    if (res.status === 429 || isQuotaError(body)) throw new ApiFootballError(QUOTA_MESSAGE, "QUOTA");
     throw new ApiFootballError(`API-Football HTTP ${res.status} sur ${path}`, "HTTP");
   }
   const json = (await res.json()) as ApiResponse<T>;
@@ -79,6 +86,7 @@ async function apiGet<T>(path: string, params: Record<string, string | number>):
     : json.errors && Object.keys(json.errors as object).length > 0;
   if (hasErrors) {
     const msg = JSON.stringify(json.errors);
+    if (isSuspendedError(msg)) throw new ApiFootballError(SUSPENDED_MESSAGE, "SUSPENDED");
     if (isQuotaError(msg)) throw new ApiFootballError(QUOTA_MESSAGE, "QUOTA");
     throw new ApiFootballError(`API-Football a renvoyé une erreur : ${msg}`, "HTTP");
   }
